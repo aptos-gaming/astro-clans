@@ -1,0 +1,6 @@
+frontend/node_modules
+.aptos
+coreMechanics/build
+mintCoins/build
+
+.DS_Store
