@@ -27,7 +27,6 @@ module owner_addr::pve_battles {
     image_url: String,
     attack: u64,
     health: u64,
-    // linked coin to this unit
     linked_coin_type: String,
   }
 

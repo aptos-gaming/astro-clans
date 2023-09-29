@@ -11,3 +11,7 @@
     ```
     Copy resource account address after deployment.
 
+
+@todo:
+- create full game using staking, swaping and pve modules
+- make a short onboard tutorial about "How to play" in AstroClans
