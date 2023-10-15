@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import { Col, Button, Modal } from "antd";
-import { Network, Provider, AptosClient } from "aptos";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { useApolloClient } from '@apollo/client';
+import { Network, Provider, AptosClient } from "aptos"
+import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import { useApolloClient } from '@apollo/client'
+import { toast } from 'react-toastify'
 
 import { AccountTokensV2WithDataQuery } from './components/TokensList'
 import CONFIG from "./config.json"
 import useSelectedToken from './context/useSelectedToken'
 import useCollectionOwner from './context/useCollectionOwner'
+import CreateCollectioForm from './components/StakingForms/CreateCollectionForm'
+import InitStakingForm from './components/StakingForms/InitStakingForm'
 
 const PackageName = "staking"
 
@@ -17,25 +20,23 @@ const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
 const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
 const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET);
 
-const RewardCoinType = `${CONFIG.stakingModule}::mint_coins::${CONFIG.coinName}`
-
 const Decimals = 8
 
-const UpgradableTokenV2Layout = () => {
+const StakingLayout = () => {
   const [unclaimedReward, setUnclaimedReward] = useState(0)
-  const [claimEvents, setClaimEvents] = useState<any[]>([])
   const { selectedToken, setSelectedToken } = useSelectedToken()
-  const { setCollectionOwnerAddress } = useCollectionOwner()
+  const { collectionOwnerAddress, setCollectionOwnerAddress } = useCollectionOwner()
   const apolloClient = useApolloClient()
 
+  // @todo: remove this as it dublicates collectionOwnerAddress
   const [ownerAddress, setOwnerAddress] = useState('')
+  const [rewardCoinType, setRewardCoinType] = useState('')
 
   const { account, signAndSubmitTransaction } = useWallet();
 
   useEffect(() => {
     async function init() {
       if (account?.address) {
-        getClaimEvents()
         getCollectionOwnerAddress()
       }
     }
@@ -43,19 +44,65 @@ const UpgradableTokenV2Layout = () => {
     
   }, [account?.address])
 
-  const createCollectionWithTokenUpgrade = async () => {
+  useEffect(() => {
+    if (collectionOwnerAddress) {
+      getRewardCoinType()
+    }
+  }, [collectionOwnerAddress])
+
+  const createCollectionWithRewards = async (selectedCoinRewardType: string) => {
     const payload = {
       type: "entry_function_payload",
       function: `${CONFIG.stakingModule}::${PackageName}::create_collection_and_enable_token_upgrade`,
-      type_arguments: [RewardCoinType],    
+      type_arguments: [selectedCoinRewardType],    
       arguments: [],
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Creating colleciton...',
+        success: 'Collection created, check your wallet',
+        error: 'Error during collection creation'
+      })
       await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
     } catch (e) {
-      console.log("ERROR during create_collection_and_enable_token_upgrade")
+      console.log(e)
+    }
+  }
+
+  const createStaking = async (tokensPerHour: number, amountToTreasury: number) => {
+    const payload = {
+      type: "entry_function_payload",
+      function: `${CONFIG.stakingModule}::${PackageName}::create_staking`,
+      type_arguments: [rewardCoinType],
+      // dph, collection_name, total_amount
+      arguments: [tokensPerHour * (10 ** Decimals), CONFIG.collectionName, amountToTreasury * 10 ** Decimals],
+    }
+    try {
+      const tx = await signAndSubmitTransaction(payload)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Initing staking...',
+        success: 'Staking inited, now you can stake & unstake & claim',
+        error: 'Error during staking initiation'
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const getRewardCoinType = async () => {
+    const payload = {
+      function: `${CONFIG.stakingModule}::${PackageName}::get_reward_coin_type`,
+      type_arguments: [],
+      // collection_owner_address
+      arguments: [collectionOwnerAddress]
+    }
+
+    try {
+      const viewResponse = await provider.view(payload)
+      setRewardCoinType(String(viewResponse[0]))
+    } catch(e) {
+      console.log("Error during getting reward coin type addres")
       console.log(e)
     }
   }
@@ -74,27 +121,6 @@ const UpgradableTokenV2Layout = () => {
       setOwnerAddress(String(viewResponse[0]))
     } catch(e) {
       console.log("Error during getting resource account addres")
-      console.log(e)
-    }
-  }
-
-  
-  const createStaking = async () => {
-    const tokensPerHour = 36
-    const amountToTreasury = 50000
-
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${PackageName}::create_staking`,
-      type_arguments: [RewardCoinType],
-      // dph, collection_name, total_amount
-      arguments: [tokensPerHour * (10 ** Decimals), CONFIG.collectionName, amountToTreasury * 10 ** Decimals],
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
-    } catch (e) {
-      console.log("ERROR during create staking tx")
       console.log(e)
     }
   }
@@ -123,7 +149,7 @@ const UpgradableTokenV2Layout = () => {
     const payload = {
       type: "entry_function_payload",
       function: `${CONFIG.stakingModule}::${PackageName}::unstake_token`,
-      type_arguments: [RewardCoinType],
+      type_arguments: [rewardCoinType],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name,
       arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
     }
@@ -143,7 +169,7 @@ const UpgradableTokenV2Layout = () => {
     const payload = {
       type: "entry_function_payload",
       function: `${CONFIG.stakingModule}::${PackageName}::claim_reward`,
-      type_arguments: [RewardCoinType],
+      type_arguments: [rewardCoinType],
       // staking_creator_addr, token_address, collection_name, token_name
       arguments: [CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name],
     }
@@ -152,30 +178,12 @@ const UpgradableTokenV2Layout = () => {
       setSelectedToken(null)
       setUnclaimedReward(0)
       await client.waitForTransactionWithResult(tx.hash)
-      getClaimEvents()
     } catch (e) {
       console.log("Error druing claim reward tx")
       console.log(e)
     }
   }
 
-  const getClaimEvents = async () => {
-    const eventStore = `${CONFIG.stakingModule}::${PackageName}::EventsStore`
-
-    try {
-      const claimEvents = await client.getEventsByEventHandle(account?.address || '', eventStore, "claim_events")
-      const formmatedClaimEvents = claimEvents.map((claimEvent) => ({
-        ...claimEvent.data,
-        token_name: claimEvent.data.token_name,
-      }))
-      setClaimEvents(formmatedClaimEvents)
-    } catch (e: any) {
-      const errorMessage = JSON.parse(e.message)
-      if (errorMessage.error_code === "resource_not_found") {
-        console.log("No claims for upgradable token staking")
-      }
-    }
-  }
 
   const getUnclaimedReward = async (token: any) => {
     const payload = {
@@ -204,7 +212,7 @@ const UpgradableTokenV2Layout = () => {
     const payload = {
       type: "entry_function_payload",
       function: `${CONFIG.stakingModule}::${PackageName}::upgrade_token`,
-      type_arguments: [RewardCoinType],
+      type_arguments: [rewardCoinType],
       // collection_owner, token address
       arguments: [ownerAddress, selectedToken?.storage_id],
     }
@@ -222,23 +230,16 @@ const UpgradableTokenV2Layout = () => {
   return (
     <>  
       <Col>
-        <h3 className='admin-section'>Admin section</h3>
-        <Button
-          disabled={!account?.address}
-          onClick={createCollectionWithTokenUpgrade}
-          type="primary"
-          style={{ marginLeft: '1rem' }}
-        >
-          Create Collection With Token Upgrade
-        </Button>
-        <Button
-          disabled={!account?.address}
-          onClick={createStaking}
-          type="primary"
-          style={{ marginLeft: '1rem' }}
-        >
-          Init Staking
-        </Button>
+        <h3 className='admin-section'>Token Staking</h3>
+        <CreateCollectioForm
+          createCollectionWithRewards={createCollectionWithRewards}
+          isDisabled={!account?.address || !!rewardCoinType}
+        />
+        <div className="divider" />
+        <InitStakingForm
+          createStaking={createStaking}
+          isDisabled={!account?.address || !rewardCoinType}
+        />
         <Modal
           title="Upgradable Staking Actions"
           open={!!selectedToken}
@@ -290,4 +291,4 @@ const UpgradableTokenV2Layout = () => {
   );
 }
 
-export default UpgradableTokenV2Layout;
+export default StakingLayout;

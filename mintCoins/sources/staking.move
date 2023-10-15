@@ -1,4 +1,4 @@
-module owner_addr::mint_stake_upgrade_tokens_v2 {
+module owner_addr::staking {
   use std::string::{ Self, String };
   use std::bcs;
   use std::signer;
@@ -68,7 +68,7 @@ module owner_addr::mint_stake_upgrade_tokens_v2 {
   struct AdminData has key {
     signer_cap: account::SignerCapability,
     source: address,
-    coin_type: address,
+    coin_type: String,
   }
 
   // for upgrade token
@@ -113,6 +113,7 @@ module owner_addr::mint_stake_upgrade_tokens_v2 {
     simple_map::add(&mut maps.map, collection_name, resource_signer_address);
   }
 
+  // return address of resource account 
   #[view]
   fun get_staking_resource_address_by_collection_name(creator: address, collection_name: String): address acquires CollectionOwnerInfo {
     assert!(exists<CollectionOwnerInfo>(creator), ENO_UPGRADE);
@@ -120,6 +121,15 @@ module owner_addr::mint_stake_upgrade_tokens_v2 {
 
     let resource_address = *simple_map::borrow(&staking_creators_data.map, &collection_name);
     resource_address
+  }
+
+  // return address of RewardCoinType
+  #[view]
+  fun get_reward_coin_type(collection_owner_addr: address): String acquires AdminData {
+    assert!(exists<AdminData>(collection_owner_addr), ENO_COLLECTION_DOESNT_EXIST);
+    let admin_data = borrow_global<AdminData>(collection_owner_addr);
+
+    admin_data.coin_type
   }
 
   // init event store on staker address
@@ -196,8 +206,8 @@ module owner_addr::mint_stake_upgrade_tokens_v2 {
   // end of helper functions
 
   public entry fun create_collection_and_enable_token_upgrade<CoinType>(owner: &signer) acquires CollectionOwnerInfo {
-    let collection_name = string::utf8(b"Staking Collection");
-    let collection_description = string::utf8(b"Staking NFT collection");
+    let collection_name = string::utf8(b"Astro Clans");
+    let collection_description = string::utf8(b"Astro Clans collection");
     let collection_uri = string::utf8(b"Empty");
     let max_supply = 100;
 
@@ -215,7 +225,7 @@ module owner_addr::mint_stake_upgrade_tokens_v2 {
     move_to<AdminData>(&resource_signer_from_cap, AdminData {
       signer_cap: resource_cap,
       source: signer::address_of(owner),
-      coin_type: coin_address<CoinType>(),
+      coin_type: type_info::type_name<CoinType>(),
     });
 
     let token_uris = vector<String>[

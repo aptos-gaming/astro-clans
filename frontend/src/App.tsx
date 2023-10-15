@@ -10,6 +10,7 @@ import {
   HttpLink,
   NormalizedCacheObject,
 } from '@apollo/client'
+import { ToastContainer } from 'react-toastify';
 
 import { CollectionOwnerProvider} from './context/CollectionOwnerProvider'
 import { CoinBalancesProvider } from './context/CoinBalancesProvider'
@@ -20,6 +21,7 @@ import CONFIG from './config.json'
 import DexLayoyt from './DexLayoyt'
 import StakingLayout from './StakingLayout'
 import PvELayout from './PvELayout'
+import { TokensList } from './components'
 
 const APTOS_GRAPH = `https://indexer-${CONFIG.network}.staging.gcp.aptosdev.com/v1/graphql`
 
@@ -44,9 +46,11 @@ const App = () => {
           <CoinBalancesProvider>
             <SelectedTokenProvider>
               <WalletConnect />
+              <ToastContainer />
               <CoinBalance />
-              {/* <DexLayoyt /> */}
+              <TokensList />
               <StakingLayout />
+              <DexLayoyt />
               {/* <PvELayout /> */}
             </SelectedTokenProvider>
           </CoinBalancesProvider>
