@@ -11,13 +11,14 @@ import {
   NormalizedCacheObject,
 } from '@apollo/client'
 
+import { CollectionOwnerProvider} from './context/CollectionOwnerProvider'
 import { CoinBalancesProvider } from './context/CoinBalancesProvider'
 import { SelectedTokenProvider } from './context/SelectedTokenProvider'
 import WalletConnect from './components/WalletConnect'
 import CoinBalance from './components/CoinBalance'
 import CONFIG from './config.json'
 import DexLayoyt from './DexLayoyt'
-import UpgradableTokenV2Layout from './UpgradableTokenV2Layout'
+import StakingLayout from './StakingLayout'
 import PvELayout from './PvELayout'
 
 const APTOS_GRAPH = `https://indexer-${CONFIG.network}.staging.gcp.aptosdev.com/v1/graphql`
@@ -39,15 +40,17 @@ const App = () => {
   return (
     <ApolloProvider client={graphqlClient}>
       <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
-        <CoinBalancesProvider>
-          <SelectedTokenProvider>
-            <WalletConnect />
-            <CoinBalance />
-            <DexLayoyt />
-            <UpgradableTokenV2Layout />
-            <PvELayout />
-          </SelectedTokenProvider>
-        </CoinBalancesProvider>
+        <CollectionOwnerProvider>
+          <CoinBalancesProvider>
+            <SelectedTokenProvider>
+              <WalletConnect />
+              <CoinBalance />
+              {/* <DexLayoyt /> */}
+              <StakingLayout />
+              {/* <PvELayout /> */}
+            </SelectedTokenProvider>
+          </CoinBalancesProvider>
+        </CollectionOwnerProvider>
       </AptosWalletAdapterProvider>
     </ApolloProvider>
   );

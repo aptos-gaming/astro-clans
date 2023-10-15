@@ -37,7 +37,7 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
   const onCreateUnitType = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::create_unit_type`,
+      function: `${CONFIG.pveModule}::${PackageName}::create_unit_type`,
       type_arguments: [],
       arguments: [String(unitsList.length + 1)]
     }
@@ -56,11 +56,11 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
       return
     }
     // admin should init type first and only then create new unit
-    const coinType = `${CONFIG.moduleAddress}::coin${unitsList.length + 1}::T`
+    const coinType = `${CONFIG.pveModule}::coin${unitsList.length + 1}::T`
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::create_unit`,
+      function: `${CONFIG.pveModule}::${PackageName}::create_unit`,
       type_arguments: [coinType],
       arguments: [name, description, imageUrl, attack, health]
     }

@@ -1,4 +1,9 @@
 {
-  "moduleAddress": "0xecea4a4dca5110d757d5ef3f95b86a374efd1439d4d89a66f746588cd9789123",
-  "network": "testnet"
+  "stakingModule": "0xab062f29c391d8f57a04dfc44805a7685eae4e6a660e796e6083fc913218e69f",
+  "swapModule": "0x75b955210d2a44b14b60a299eedc0fae08def4f364e61d7a4b43ed18ad05b6c6",
+  "dexModule": "0x1",
+  "pveModule": "0x2",
+  "collectionName": "Astro Clans",
+  "coinName": "",
+  "network": "devnet"
 }

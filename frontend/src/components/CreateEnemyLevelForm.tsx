@@ -49,7 +49,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::${enemyLevelType}`,
+      function: `${CONFIG.pveModule}::${PackageName}::${enemyLevelType}`,
       type_arguments: [...selectedResourceType],
       // name: String, attack: u64, health: u64, reward_coin_1_amount: u64 / reward_coin_2_amount: u64,
       arguments: payloadArgs

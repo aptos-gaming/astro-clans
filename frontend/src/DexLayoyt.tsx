@@ -65,7 +65,7 @@ const DexLayoyt = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::${pairType}`,
+      function: `${CONFIG.dexModule}::${PackageName}::${pairType}`,
       type_arguments: typeArguments,
       arguments: [pairId],
     }
@@ -106,7 +106,7 @@ const DexLayoyt = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::${pairType}`,
+      function: `${CONFIG.dexModule}::${PackageName}::${pairType}`,
       type_arguments: typeArguments,
       //            basic swap   triple or quadruple          
       // pair_id, coin_amount_a / coin_amount_b
@@ -157,7 +157,7 @@ const DexLayoyt = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::${pairType}`,
+      function: `${CONFIG.dexModule}::${PackageName}::${pairType}`,
       type_arguments: typeArguments,
       arguments: args,
     }
@@ -179,7 +179,7 @@ const DexLayoyt = () => {
   // get list of all pairs
   const getAllTradingPairs = async () => {
     const payload = {
-      function: `${CONFIG.moduleAddress}::${PackageName}::get_all_pairs`,
+      function: `${CONFIG.dexModule}::${PackageName}::get_all_pairs`,
       type_arguments: [],
       arguments: []
     }
@@ -201,10 +201,10 @@ const DexLayoyt = () => {
   }, [account?.address])
 
   const getSwapEvents = async () => {
-    const eventsStore = `${CONFIG.moduleAddress}::${PackageName}::Events`
+    const eventsStore = `${CONFIG.dexModule}::${PackageName}::Events`
 
     try {
-      const eventsResult = await client.getEventsByEventHandle(CONFIG.moduleAddress, eventsStore, "swap_event")
+      const eventsResult = await client.getEventsByEventHandle(CONFIG.dexModule, eventsStore, "swap_event")
       const formattedSwapEvents = eventsResult.map((event) => ({
         id: event.guid.account_address + event.guid.creation_number,
         ...event.data,

@@ -64,42 +64,15 @@ export const AccountTokensV2WithDataQuery = gql
     }
   }
 `
+const PackageName = "staking"
 
-export const AccountTokensV1WithDataQuery = gql
-  `query AccountTokensV1WithDataQuery($owner_address: String, $collection_name: String) {
-    current_token_ownerships_aggregate(
-      where: {owner_address: {_eq: $owner_address }, collection_name: {_eq: $collection_name }}
-    ) {
-      aggregate {
-        count(columns: amount)
-      }
-      nodes {
-        name
-        owner_address
-        collection_name
-        property_version
-        current_token_data {
-          metadata_uri
-          default_properties
-        }
-        amount
-        token_data_id_hash
-      }
-    }
-  }
-`
-
-interface TokensListProps {
-  packageName: 'upgradable_token_v1_staking' | 'token_v1_staking'
-}
-
-export const TokensList = ({ packageName }: TokensListProps) => {
+export const TokensList = () => {
   const [tokens, setTokens] = useState<TokenV1Props[]>([])
   const { connected, account } = useWallet()
   const { setSelectedToken } = useSelectedToken()
   const { collectionOwnerAddress } = useCollectionOwner()
 
-  const { loading, data } = useGraphqlQuery(CONFIG.tokenVersion === 2 ? AccountTokensV2WithDataQuery : AccountTokensV1WithDataQuery, {
+  const { loading, data } = useGraphqlQuery(AccountTokensV2WithDataQuery, {
     variables: {
       owner_address: account?.address,
       collection_name: CONFIG.collectionName,
@@ -109,7 +82,7 @@ export const TokensList = ({ packageName }: TokensListProps) => {
 
   const getStakedTokenIds = async (): Promise<Array<any>> => {
     const payload = {
-      function: `${CONFIG.moduleAddress}::${packageName}::get_tokens_staking_statuses`,
+      function: `${CONFIG.stakingModule}::${PackageName}::get_tokens_staking_statuses`,
       type_arguments: [],
       arguments: [account?.address]
     }
@@ -175,20 +148,15 @@ export const TokensList = ({ packageName }: TokensListProps) => {
         <div className='itemImage'>
           <img
             style={{ maxWidth: '250px' }}
-            src={CONFIG.tokenVersion === 2 ? rowData.current_token_data.token_uri : rowData.current_token_data.metadata_uri}
+            src={rowData.current_token_data.token_uri}
             alt='Nft'
           />
         </div>
         <div className='itemDetails'>
-          <span className='planet-level'>⭐ {CONFIG.tokenVersion === 2 ? rowData.current_token_data.token_properties.level : rowData.current_token_data.default_properties.level}</span>
-          <span>Name: {CONFIG.tokenVersion === 2 ? rowData.current_token_data.token_name : rowData.name}</span>
+          <span className='planet-level'>⭐ {rowData.current_token_data.token_properties.level}</span>
+          <span>Name: {rowData.current_token_data.token_name}</span>
           <span>Resources: Minerals</span>
-          {CONFIG.tokenVersion === 1 && (
-            <span>Status: {String(rowData.amount) === '0' ? <span className='planet-farming'>Farming</span> : <span className='planet-available'>Available</span>}</span>
-          )}
-          {CONFIG.tokenVersion === 2 && (
-            <span>Status: {rowData.is_soulbound_v2 ? <span className='planet-farming'>Farming</span> : <span className='planet-available'>Available</span>}</span>
-          )}
+          <span>Status: {rowData.is_soulbound_v2 ? <span className='planet-farming'>Farming</span> : <span className='planet-available'>Available</span>}</span>
         </div>
       </div>
     );
@@ -202,7 +170,7 @@ export const TokensList = ({ packageName }: TokensListProps) => {
             {tokens.map((rowData) => (
               <RowItem
                 rowData={rowData}
-                packageName={packageName}
+                packageName={PackageName}
                 setSelectedToken={setSelectedToken}
               />
             ))}

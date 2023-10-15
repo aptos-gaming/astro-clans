@@ -88,7 +88,7 @@ const PvELayout = () => {
 
   const getUnitsList = async () => {
     const payload = {
-      function: `${CONFIG.moduleAddress}::${PackageName}::get_all_units`,
+      function: `${CONFIG.pveModule}::${PackageName}::get_all_units`,
       type_arguments: [],
       arguments: [account?.address]
     }
@@ -104,7 +104,7 @@ const PvELayout = () => {
 
   const getContractsList = async () => {
     const payload = {
-      function: `${CONFIG.moduleAddress}::${PackageName}::get_all_unit_contracts`,
+      function: `${CONFIG.pveModule}::${PackageName}::get_all_unit_contracts`,
       type_arguments: [],
       arguments: [account?.address]
     }
@@ -120,7 +120,7 @@ const PvELayout = () => {
 
   const getEnemysList = async () => {
     const payload = {
-      function: `${CONFIG.moduleAddress}::${PackageName}::get_all_enemy_levels`,
+      function: `${CONFIG.pveModule}::${PackageName}::get_all_enemy_levels`,
       type_arguments: [],
       arguments: [account?.address]
     }
@@ -137,7 +137,7 @@ const PvELayout = () => {
   const onMintCoins = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::mint_coins`,
+      function: `${CONFIG.pveModule}::${PackageName}::mint_coins`,
       type_arguments: [],
       arguments: []
     }
@@ -154,7 +154,7 @@ const PvELayout = () => {
   const onRemoveContract = async (contractId: string) => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::remove_unit_contract`,
+      function: `${CONFIG.pveModule}::${PackageName}::remove_unit_contract`,
       type_arguments: [],
       // contract_id: u64
       arguments: [contractId]
@@ -172,7 +172,7 @@ const PvELayout = () => {
   const onRemoveEnemyLevel = async (levelId: string) => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::remove_enemy_level`,
+      function: `${CONFIG.pveModule}::${PackageName}::remove_enemy_level`,
       type_arguments: [],
       // enemy_level_id: u64
       arguments: [levelId]
@@ -190,7 +190,7 @@ const PvELayout = () => {
   const onBuyUnits = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::buy_units`,
+      function: `${CONFIG.pveModule}::${PackageName}::buy_units`,
       // <CoinType, UnitType>
       type_arguments: [selectedContract?.coinType, selectedContract.unitType],
       // contract_id: u64, coins_amount: u64, number_of_units: u64
@@ -253,7 +253,7 @@ const PvELayout = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::${attackType}`,
+      function: `${CONFIG.pveModule}::${PackageName}::${attackType}`,
       // <RewardCoin1Type/RewardCoin2Type, UnitType1/UnitType2 
       type_arguments: payloadTypeArgs,
       // for 1 unit - enemy_level_id: u64, number_of_units: u64, unit_id: u64
@@ -276,7 +276,7 @@ const PvELayout = () => {
   }
 
   const getEnemyAttackedEvents = async () => {
-    const eventStore = `${CONFIG.moduleAddress}::${PackageName}::Events`
+    const eventStore = `${CONFIG.pveModule}::${PackageName}::Events`
 
     try {
       const attackedEvents = await client.getEventsByEventHandle(account?.address || '', eventStore, "enemy_attacked_event")

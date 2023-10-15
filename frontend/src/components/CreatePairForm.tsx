@@ -102,7 +102,7 @@ export const CreatePairForm = ({ getAllTradingPairs }: any) => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::${pairType}`,
+      function: `${CONFIG.dexModule}::${PackageName}::${pairType}`,
       type_arguments: typeArguments,
       // exchange_rate, coin_a_amount, coin_b_amount
       arguments: args,

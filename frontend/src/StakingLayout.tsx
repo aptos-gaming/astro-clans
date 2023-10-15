@@ -5,12 +5,11 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useApolloClient } from '@apollo/client';
 
 import { AccountTokensV2WithDataQuery } from './components/TokensList'
-import EventsTable from './components/EventsTable';
 import CONFIG from "./config.json"
 import useSelectedToken from './context/useSelectedToken'
 import useCollectionOwner from './context/useCollectionOwner'
 
-const PackageName = "mint_stake_upgrade_tokens_v2"
+const PackageName = "staking"
 
 const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
 const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
@@ -18,7 +17,7 @@ const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
 const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
 const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET);
 
-const RewardCoinType = `${CONFIG.moduleAddress}::mint_coins::${CONFIG.coinName}`
+const RewardCoinType = `${CONFIG.stakingModule}::mint_coins::${CONFIG.coinName}`
 
 const Decimals = 8
 
@@ -47,7 +46,7 @@ const UpgradableTokenV2Layout = () => {
   const createCollectionWithTokenUpgrade = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::create_collection_and_enable_token_upgrade`,
+      function: `${CONFIG.stakingModule}::${PackageName}::create_collection_and_enable_token_upgrade`,
       type_arguments: [RewardCoinType],    
       arguments: [],
     }
@@ -63,10 +62,10 @@ const UpgradableTokenV2Layout = () => {
 
   const getCollectionOwnerAddress = async () => {
     const payload = {
-      function: `${CONFIG.moduleAddress}::${PackageName}::get_staking_resource_address_by_collection_name`,
+      function: `${CONFIG.stakingModule}::${PackageName}::get_staking_resource_address_by_collection_name`,
       type_arguments: [],
       // creator, collection_name
-      arguments: [CONFIG.moduleAddress, CONFIG.collectionName]
+      arguments: [CONFIG.stakingModule, CONFIG.collectionName]
     }
 
     try {
@@ -86,7 +85,7 @@ const UpgradableTokenV2Layout = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::create_staking`,
+      function: `${CONFIG.stakingModule}::${PackageName}::create_staking`,
       type_arguments: [RewardCoinType],
       // dph, collection_name, total_amount
       arguments: [tokensPerHour * (10 ** Decimals), CONFIG.collectionName, amountToTreasury * 10 ** Decimals],
@@ -103,10 +102,10 @@ const UpgradableTokenV2Layout = () => {
   const onStakeToken = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::stake_token`,
+      function: `${CONFIG.stakingModule}::${PackageName}::stake_token`,
       type_arguments: [],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name, tokens
-      arguments: [CONFIG.moduleAddress, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
+      arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
@@ -123,10 +122,10 @@ const UpgradableTokenV2Layout = () => {
   const onUnstakeStaking = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::unstake_token`,
+      function: `${CONFIG.stakingModule}::${PackageName}::unstake_token`,
       type_arguments: [RewardCoinType],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name,
-      arguments: [CONFIG.moduleAddress, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
+      arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
@@ -143,10 +142,10 @@ const UpgradableTokenV2Layout = () => {
   const onClaimReward = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::claim_reward`,
+      function: `${CONFIG.stakingModule}::${PackageName}::claim_reward`,
       type_arguments: [RewardCoinType],
       // staking_creator_addr, token_address, collection_name, token_name
-      arguments: [CONFIG.moduleAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name],
+      arguments: [CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name],
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
@@ -161,7 +160,7 @@ const UpgradableTokenV2Layout = () => {
   }
 
   const getClaimEvents = async () => {
-    const eventStore = `${CONFIG.moduleAddress}::${PackageName}::EventsStore`
+    const eventStore = `${CONFIG.stakingModule}::${PackageName}::EventsStore`
 
     try {
       const claimEvents = await client.getEventsByEventHandle(account?.address || '', eventStore, "claim_events")
@@ -180,10 +179,10 @@ const UpgradableTokenV2Layout = () => {
 
   const getUnclaimedReward = async (token: any) => {
     const payload = {
-      function: `${CONFIG.moduleAddress}::${PackageName}::get_unclaimed_reward`,
+      function: `${CONFIG.stakingModule}::${PackageName}::get_unclaimed_reward`,
       type_arguments: [],
       // staker_addr, staking_creator_addr, token_address, collection_name, token_name
-      arguments: [account?.address, CONFIG.moduleAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
+      arguments: [account?.address, CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
     }
 
     try {
@@ -204,7 +203,7 @@ const UpgradableTokenV2Layout = () => {
   const onLevelUpgrade = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::upgrade_token`,
+      function: `${CONFIG.stakingModule}::${PackageName}::upgrade_token`,
       type_arguments: [RewardCoinType],
       // collection_owner, token address
       arguments: [ownerAddress, selectedToken?.storage_id],
@@ -240,7 +239,6 @@ const UpgradableTokenV2Layout = () => {
         >
           Init Staking
         </Button>
-        <EventsTable data={claimEvents} title="Upgradable Token Staking" />
         <Modal
           title="Upgradable Staking Actions"
           open={!!selectedToken}

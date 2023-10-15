@@ -46,7 +46,7 @@ const CreateUnitContractForm = ({ unitsList, getContractsList }: CreateUnitContr
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.moduleAddress}::${PackageName}::create_unit_contract`,
+      function: `${CONFIG.pveModule}::${PackageName}::create_unit_contract`,
       // resource_type, unit_type
       type_arguments: [selectedResourceType, unitData.value.linked_coin_type],
       // unit_id: u64, fixed_price: u64
