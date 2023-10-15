@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Input, Row, Button, Col, Modal, Form, Switch } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
-import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design"
-import { AptosClient, Provider, Network } from "aptos"
-import { useApolloClient } from "@apollo/client"
-import Decimal from "decimal.js"
+import { WalletSelector } from '@aptos-labs/wallet-adapter-ant-design'
+import { AptosClient, Provider, Network } from 'aptos'
+import { useApolloClient } from '@apollo/client'
+import Decimal from 'decimal.js'
+import { toast } from 'react-toastify'
 
 import { CoinBalancesQuery } from './components/CoinBalance'
-import { SwapEventsTable, AllPairsTable, CreatePairForm } from './components'
-import { formatCoinName, multipleWithDecimal } from './components/CreatePairForm'
+import { AllPairsTable, CreatePairForm } from './components'
+import { formatCoinName, multipleWithDecimal } from './components/DexForms/CreatePairForm'
 import CONFIG from "./config.json"
 
 const PackageName = "swap_coins"
@@ -20,7 +21,6 @@ const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : T
 const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET);
 
 const Decimals = 8
-
 
 const DexLayoyt = () => {
   const { account, signAndSubmitTransaction } = useWallet()
@@ -39,7 +39,6 @@ const DexLayoyt = () => {
 
   // events
   const [selectedPairData, onSelectedPairData] = useState<any>(null)
-  const [swapEvents, setSwapEvents] = useState<Array<any>>([])
 
   const [tradingPairs, setTradingPairs] = useState([])
   const [isIncreaseReservesVisible, setIsIncreaseReservesVisible] = useState(false)
@@ -65,17 +64,20 @@ const DexLayoyt = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.dexModule}::${PackageName}::${pairType}`,
+      function: `${CONFIG.swapModule}::${PackageName}::${pairType}`,
       type_arguments: typeArguments,
       arguments: [pairId],
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Removing trading pair...',
+        success: 'Trading pair removed',
+        error: 'Error during trading pair remove'
+      })
       await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
       getAllTradingPairs()
     } catch (e) {
-      console.log(`Error during ${pairType} tx`)
       console.log(e)
     }
   }
@@ -106,7 +108,7 @@ const DexLayoyt = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.dexModule}::${PackageName}::${pairType}`,
+      function: `${CONFIG.swapModule}::${PackageName}::${pairType}`,
       type_arguments: typeArguments,
       //            basic swap   triple or quadruple          
       // pair_id, coin_amount_a / coin_amount_b
@@ -114,13 +116,16 @@ const DexLayoyt = () => {
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Swapping...',
+        success: 'Succesfully swapped',
+        error: 'Error during swap'
+      })
       await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
       setCoinFromAmount("0")
       setCoinToAmount1("0")
       setCoinToAmount2(0)
     } catch (e) {
-      console.log("Error during swap coins tx")
       console.log(e)
     }
   }
@@ -157,13 +162,17 @@ const DexLayoyt = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.dexModule}::${PackageName}::${pairType}`,
+      function: `${CONFIG.swapModule}::${PackageName}::${pairType}`,
       type_arguments: typeArguments,
       arguments: args,
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Adding to reserves...',
+        success: 'Added to reserves',
+        error: 'Error during adding to reserves'
+      })
       await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
       setCoinAAmountReserve(0)
       setCoinBAmountReserve(0)
@@ -171,7 +180,6 @@ const DexLayoyt = () => {
       setCoinDAmountReserve(0)
       setIsIncreaseReservesVisible(false)
     } catch (e) {
-      console.log("Error during swap coins tx")
       console.log(e)
     }
   }
@@ -179,7 +187,7 @@ const DexLayoyt = () => {
   // get list of all pairs
   const getAllTradingPairs = async () => {
     const payload = {
-      function: `${CONFIG.dexModule}::${PackageName}::get_all_pairs`,
+      function: `${CONFIG.swapModule}::${PackageName}::get_all_pairs`,
       type_arguments: [],
       arguments: []
     }
@@ -188,7 +196,7 @@ const DexLayoyt = () => {
       const allPairsResponse: any = await provider.view(payload)
       setTradingPairs(allPairsResponse[0].data)
     } catch(e) {
-      console.log("Error during getting unclaimed")
+      console.log("Error during getting all trading pairs")
       console.log(e)
     }
   }
@@ -196,28 +204,8 @@ const DexLayoyt = () => {
   useEffect(() => {
     if (account?.address) {
       getAllTradingPairs()
-      getSwapEvents()
     }
   }, [account?.address])
-
-  const getSwapEvents = async () => {
-    const eventsStore = `${CONFIG.dexModule}::${PackageName}::Events`
-
-    try {
-      const eventsResult = await client.getEventsByEventHandle(CONFIG.dexModule, eventsStore, "swap_event")
-      const formattedSwapEvents = eventsResult.map((event) => ({
-        id: event.guid.account_address + event.guid.creation_number,
-        ...event.data,
-      }))
-      setSwapEvents(formattedSwapEvents)
-    } catch (e: any) {
-      console.log(e)
-      const errorMessage = JSON.parse(e.message)
-      if (errorMessage.error_code === "resource_not_found") {
-        console.log("No swaps for now")
-      }
-    }
-  }
 
   useEffect(() => {
     if (coinFromAmount && selectedPairData) {
@@ -317,9 +305,6 @@ const DexLayoyt = () => {
           </Col>
           <Col>
             <CreatePairForm getAllTradingPairs={getAllTradingPairs} />
-          </Col>
-          <Col>
-            <SwapEventsTable data={swapEvents} />
           </Col>
           <Modal
             title="Increase reserves"

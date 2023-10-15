@@ -3,8 +3,8 @@ import { Form, Input, Button, Select } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { AptosClient } from "aptos"
 
-import useCoinBalances from "../context/useCoinBalances"
-import CONFIG from "../config.json"
+import useCoinBalances from "../../context/useCoinBalances"
+import CONFIG from "../../config.json"
 
 const { Option } = Select;
 

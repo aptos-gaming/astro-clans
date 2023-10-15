@@ -51,7 +51,7 @@ const App = () => {
               <TokensList />
               <StakingLayout />
               <DexLayoyt />
-              {/* <PvELayout /> */}
+              <PvELayout />
             </SelectedTokenProvider>
           </CoinBalancesProvider>
         </CollectionOwnerProvider>

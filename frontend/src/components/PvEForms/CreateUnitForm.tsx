@@ -3,8 +3,8 @@ import { Form, Input, Button } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { AptosClient } from "aptos"
 
-import { Unit } from '../PvELayout'
-import CONFIG from "../config.json"
+import { Unit } from '../../PvELayout'
+import CONFIG from "../../config.json"
 
 const PackageName = "pve_battles"
 

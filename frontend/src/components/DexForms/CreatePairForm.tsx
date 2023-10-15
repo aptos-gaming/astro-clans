@@ -5,10 +5,10 @@ import { AptosClient } from "aptos"
 import { useApolloClient } from "@apollo/client"
 import Decimal from "decimal.js"
 
-import { CoinBalancesQuery } from './CoinBalance'
-import useCoinBalances from "../context/useCoinBalances"
-import CONFIG from "../config.json"
-import { CoinBalance } from "../context/CoinBalancesProvider"
+import { CoinBalancesQuery } from '../CoinBalance'
+import useCoinBalances from "../../context/useCoinBalances"
+import CONFIG from "../../config.json"
+import { CoinBalance } from "../../context/CoinBalancesProvider"
 
 const { Option } = Select;
 
@@ -102,7 +102,7 @@ export const CreatePairForm = ({ getAllTradingPairs }: any) => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.dexModule}::${PackageName}::${pairType}`,
+      function: `${CONFIG.swapModule}::${PackageName}::${pairType}`,
       type_arguments: typeArguments,
       // exchange_rate, coin_a_amount, coin_b_amount
       arguments: args,

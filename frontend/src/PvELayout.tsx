@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import { Row, Col, Button, Modal, Slider, InputNumber } from 'antd'
 import { Provider, Network } from 'aptos'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { AptosClient } from 'aptos'
-import Decimal from 'decimal.js';
-import { useApolloClient } from '@apollo/client';
+import Decimal from 'decimal.js'
+import { useApolloClient } from '@apollo/client'
+import { toast } from 'react-toastify'
 
 import {
   CreateEnemyLevelForm,
@@ -13,7 +14,6 @@ import {
   AllContractsTable,
   AllEnemyLevelsTable,
   UnitsList,
-  EventsTable,
 } from './components'
 
 import useCoinBalances from './context/useCoinBalances';
@@ -74,7 +74,6 @@ const PvELayout = () => {
   const { account, signAndSubmitTransaction } = useWallet();
   const apolloClient = useApolloClient()
 
-  const [attackedEvents, setAttackedEvents] = useState<any>([])
   const [maxUnits, setMaxUnits] = useState(0)
   const [unitsList, setUnitsList] = useState<Array<Unit>>([])
   const [contractsList, setContractsList] = useState<Array<Contract>>([])
@@ -267,26 +266,10 @@ const PvELayout = () => {
       getContractsList()
       setSelectedContract('')
       setSelectedLevel(null)
-      getEnemyAttackedEvents()
       await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
     } catch (e) {
       console.log("ERROR during attack enemy")
       console.log(e)
-    }
-  }
-
-  const getEnemyAttackedEvents = async () => {
-    const eventStore = `${CONFIG.pveModule}::${PackageName}::Events`
-
-    try {
-      const attackedEvents = await client.getEventsByEventHandle(account?.address || '', eventStore, "enemy_attacked_event")
-  
-      setAttackedEvents(attackedEvents)
-    } catch (e: any) {
-      const errorMessage = JSON.parse(e.message)
-      if (errorMessage.error_code === "resource_not_found") {
-        console.log("No attackes for now")
-      }
     }
   }
 
@@ -295,7 +278,6 @@ const PvELayout = () => {
       getUnitsList()
       getContractsList()
       getEnemysList()
-      getEnemyAttackedEvents()
     }
   }, [account])
 
@@ -366,7 +348,6 @@ const PvELayout = () => {
         onRemoveEnemyLevel={onRemoveEnemyLevel}
       />
       <div className="divider" />
-      <EventsTable data={attackedEvents} />
       {/* Modal to attack PvE enemy */}
       <Modal
         title={`Attack ${selectedLevel?.name}`}
