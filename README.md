@@ -15,3 +15,10 @@
 @todo:
 - create full game using staking, swaping and pve modules
 - make a short onboard tutorial about "How to play" in AstroClans
+
+
+
+1. Build and deploy all `Move` modules
+2. cd `/move/staking`,  run `aptos move publish --named-addresses owner_addr=` 
+3. cd `/move/swap`, run `aptos move create-resource-account-and-publish-package --seed 12345 --address-name owner_addr --profile default --named-addresses source_addr=2cbe8c04f53ef52f58581a95649fd665e73346399f8a1c5b1e8b88b462c8f764`
+4. cd `/move/pve`, run `aptos move create-resource-account-and-publish-package --seed 56789 --address-name owner_addr --profile default --named-addresses source_addr=2cbe8c04f53ef52f58581a95649fd665e73346399f8a1c5b1e8b88b462c8f764`
