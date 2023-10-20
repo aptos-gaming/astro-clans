@@ -1,10 +1,10 @@
-import * as React from 'react'
+import React from 'react'
 import { Tabs, TabsProps } from 'antd'
 
-import PvELayout from './PvELayout'
-import DexLayoyt from './DexLayout'
-import StakingLayout from './StakingLayout'
-import { TokensList } from './components'
+import PvELayout from '../PvELayout'
+import DexLayoyt from '../DexLayout'
+import StakingLayout from '../StakingLayout'
+import { TokensList } from '../components'
 
 const items: TabsProps['items'] = [{
   key: '1',
@@ -34,10 +34,10 @@ const items: TabsProps['items'] = [{
   ),
 }]
 
-const AdminLayout = () => {
+const Admin = () => {
   return (
     <Tabs type="card" defaultActiveKey="1" items={items} />
   )
 }
 
-export default AdminLayout
+export default Admin

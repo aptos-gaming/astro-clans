@@ -19,8 +19,7 @@ import { SelectedTokenProvider } from './context/SelectedTokenProvider'
 import WalletConnect from './components/WalletConnect'
 import CoinBalance from './components/CoinBalance'
 import CONFIG from './config.json'
-import AdminLayout from './AdminLayout'
-import { TokensList } from './components'
+import { Home, Admin, Player } from './pages'
 
 const APTOS_GRAPH = `https://indexer-${CONFIG.network}.staging.gcp.aptosdev.com/v1/graphql`
 
@@ -37,15 +36,26 @@ function getGraphqlClient(): ApolloClient<NormalizedCacheObject> {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div />,
+    element: <Home />,
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: (
+      <>
+        <WalletConnect />
+        <CoinBalance />
+        <Admin />
+      </>
+    ),
   },
   {
     path: "/play",
-    element: <TokensList />,
+    element: (
+      <>
+        <WalletConnect />
+        <Player />
+      </>
+    ),
   }
 ]);
 
@@ -60,9 +70,7 @@ const App = () => {
           <CoinBalancesProvider>
             <SelectedTokenProvider>
               <RouterProvider router={router} />
-              <WalletConnect />
               <ToastContainer />
-              <CoinBalance />
             </SelectedTokenProvider>
           </CoinBalancesProvider>
         </CollectionOwnerProvider>
