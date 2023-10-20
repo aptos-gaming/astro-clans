@@ -289,11 +289,6 @@ const DexLayoyt = () => {
           </div>
         </div>
       </Row>
-      <Col className='admin-switch'>
-        <span className='show-admin-panel'>Show admin panel</span>
-        <Switch checked={showBlock} onChange={toggleBlock} />
-      </Col>
-      {showBlock && (
         <div>
           <Col>
             <AllPairsTable
@@ -353,7 +348,6 @@ const DexLayoyt = () => {
             </Form>
           </Modal>
         </div>
-      )}
     </>
   )
 }

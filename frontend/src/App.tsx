@@ -10,7 +10,8 @@ import {
   HttpLink,
   NormalizedCacheObject,
 } from '@apollo/client'
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import { CollectionOwnerProvider} from './context/CollectionOwnerProvider'
 import { CoinBalancesProvider } from './context/CoinBalancesProvider'
@@ -18,9 +19,7 @@ import { SelectedTokenProvider } from './context/SelectedTokenProvider'
 import WalletConnect from './components/WalletConnect'
 import CoinBalance from './components/CoinBalance'
 import CONFIG from './config.json'
-import DexLayoyt from './DexLayoyt'
-import StakingLayout from './StakingLayout'
-import PvELayout from './PvELayout'
+import AdminLayout from './AdminLayout'
 import { TokensList } from './components'
 
 const APTOS_GRAPH = `https://indexer-${CONFIG.network}.staging.gcp.aptosdev.com/v1/graphql`
@@ -35,6 +34,21 @@ function getGraphqlClient(): ApolloClient<NormalizedCacheObject> {
 }
 
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <div />,
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+  },
+  {
+    path: "/play",
+    element: <TokensList />,
+  }
+]);
+
 const App = () => {
   const wallets = [new PetraWallet(), new MartianWallet(), new PontemWallet()];
   const graphqlClient = getGraphqlClient()
@@ -45,13 +59,10 @@ const App = () => {
         <CollectionOwnerProvider>
           <CoinBalancesProvider>
             <SelectedTokenProvider>
+              <RouterProvider router={router} />
               <WalletConnect />
               <ToastContainer />
               <CoinBalance />
-              <TokensList />
-              <StakingLayout />
-              <DexLayoyt />
-              <PvELayout />
             </SelectedTokenProvider>
           </CoinBalancesProvider>
         </CollectionOwnerProvider>
