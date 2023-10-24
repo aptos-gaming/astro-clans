@@ -1,7 +1,7 @@
 {
   "stakingModule": "0xde80f21e320cb6ee6ec1e775505563897d742611bd79218059985b452959527f",  
   "swapModule": "0xb60dfb149f094246c0842646fbbe8821b95685d0bb3a7c2c76d5c057d43bbb30",
-  "pveModule": "0xc91a9b82df4467c39775cf79528e32aebbab87bc7319fbbd165de7b79003fd7d",
+  "pveModule": "0x739d4355a5a313287e0aeb68c54172addcac230450fc37b876b7c0577b719523",
   "collectionName": "Astro Clans",
   "coinName": "",
   "network": "devnet"

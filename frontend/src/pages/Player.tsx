@@ -7,6 +7,7 @@ import { Provider, Network, AptosClient } from "aptos"
 
 import useTokenBalances from '../context/useTokenBalances'
 import useCoinBalances from '../context/useCoinBalances'
+import { CoinBalancesQuery } from '../components/CoinBalance'
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
 import { TokensList } from '../components'
 import CONFIG from '../config.json'
@@ -41,9 +42,9 @@ const Player = () => {
     try {
       const tx = await signAndSubmitTransaction(payload)
       toast.promise(client.waitForTransactionWithResult(tx.hash), {
-        pending: 'Mining new tolen...',
+        pending: 'Minting new token...',
         success: 'Token minted',
-        error: 'Error during mint token'
+        error: 'Error during token mint'
       })
       await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
     } catch (e) {
@@ -77,7 +78,27 @@ const Player = () => {
   }, [account])
 
   const onAirdropResources = async () => {
-
+    const packageName = "pve_battles"
+  
+    const payload = {
+      type: "entry_function_payload",
+      function: `${CONFIG.pveModule}::${packageName}::mint_coins`,
+      type_arguments: [],
+      arguments: []
+    }
+    try {
+      const tx = await signAndSubmitTransaction(payload)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Airdrop some coins...',
+        success: 'Airdrop received',
+        error: 'Error during coins airdrop'
+      })
+      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
+    } catch (e) {
+      console.log("ERROR during mint coins")
+      console.log(e)
+    }
+    
   }
 
   return (
@@ -93,6 +114,7 @@ const Player = () => {
       ) : null}
       {/* show only if user dont have some minimal resources on the balance */}
       <Button
+        disabled={!account}
         onClick={onAirdropResources}
         style={{ marginLeft: '8px' }}
         type='primary'

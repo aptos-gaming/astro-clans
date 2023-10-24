@@ -54,6 +54,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <WalletConnect />
+        <CoinBalance />
         <Player />
       </>
     ),
