@@ -14,6 +14,7 @@ import { ToastContainer } from 'react-toastify'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import { CollectionOwnerProvider} from './context/CollectionOwnerProvider'
+import { TokenBalancesProvider } from './context/TokenBalancesProvider'
 import { CoinBalancesProvider } from './context/CoinBalancesProvider'
 import { SelectedTokenProvider } from './context/SelectedTokenProvider'
 import WalletConnect from './components/WalletConnect'
@@ -67,12 +68,14 @@ const App = () => {
     <ApolloProvider client={graphqlClient}>
       <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
         <CollectionOwnerProvider>
-          <CoinBalancesProvider>
-            <SelectedTokenProvider>
-              <RouterProvider router={router} />
-              <ToastContainer />
-            </SelectedTokenProvider>
-          </CoinBalancesProvider>
+          <TokenBalancesProvider>
+            <CoinBalancesProvider>
+              <SelectedTokenProvider>
+                <RouterProvider router={router} />
+                <ToastContainer />
+              </SelectedTokenProvider>
+            </CoinBalancesProvider>
+          </TokenBalancesProvider>
         </CollectionOwnerProvider>
       </AptosWalletAdapterProvider>
     </ApolloProvider>

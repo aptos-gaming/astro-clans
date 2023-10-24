@@ -5,6 +5,8 @@ import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
 import { Provider, Network, AptosClient } from "aptos"
 
+import useTokenBalances from '../context/useTokenBalances'
+import useCoinBalances from '../context/useCoinBalances'
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
 import { TokensList } from '../components'
 import CONFIG from '../config.json'
@@ -16,10 +18,11 @@ const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : T
 const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET);
 
 const Player = () => {
+  const { coinBalances } = useCoinBalances()
+  const { tokenBalances } = useTokenBalances()
   const [ownerAddress, setOwnerAddress] = useState('')
-  const { account, signAndSubmitTransaction } = useWallet();
+  const { account, signAndSubmitTransaction } = useWallet()
   const apolloClient = useApolloClient()
-
 
   const onMintPlanet = async () => {
     const packageName = "staking"
@@ -28,8 +31,6 @@ const Player = () => {
       toast.error('No owner address')
       return
     }
-
-    console.log(ownerAddress)
 
     const payload = {
       type: "entry_function_payload",
@@ -81,16 +82,23 @@ const Player = () => {
 
   return (
     <>
-      {/* show only if user dont have a ny planets on balance */}
+      {tokenBalances && tokenBalances.length < 2 ? (
+        <Button
+          disabled={!account}
+          onClick={onMintPlanet}
+          type='primary'
+        >
+          Mint A Planet
+        </Button>
+      ) : null}
+      {/* show only if user dont have some minimal resources on the balance */}
       <Button
-        disabled={!account}
-        onClick={onMintPlanet}
+        onClick={onAirdropResources}
+        style={{ marginLeft: '8px' }}
         type='primary'
       >
-        Mint A Planet
+        Airdrop Resources
       </Button>
-      {/* show only if user dont have some minimal resources on the balance */}
-      <Button onClick={onAirdropResources} style={{ marginLeft: '8px' }} type='primary'>Airdrop Resources</Button>
       <TokensList />
     </>
   )

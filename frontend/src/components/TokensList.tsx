@@ -3,20 +3,10 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Col } from 'antd' 
 import { gql, useQuery as useGraphqlQuery } from '@apollo/client'
 
+import useTokenBalances from '../context/useTokenBalances'
+import { TokenV2Props } from '../context/TokenBalancesProvider'
 import useSelectedToken from '../context/useSelectedToken'
 import CONFIG from '../config.json'
-
-export type TokenV2Props = {
-  amount: number,
-  current_token_data: {
-    token_name: string,
-    token_uri: string,
-    token_properties: {
-      level: string
-    },
-  },
-  storage_id: string,
-}
 
 interface RowItemProps {
   rowData: any;
@@ -51,6 +41,7 @@ export const TokensList = () => {
   const [tokens, setTokens] = useState<TokenV2Props[]>([])
   const { connected, account } = useWallet()
   const { setSelectedToken } = useSelectedToken()
+  const { setTokenBalances } = useTokenBalances()
 
   const { loading, data } = useGraphqlQuery(AccountTokensV2WithDataQuery, {
     variables: {
@@ -63,10 +54,10 @@ export const TokensList = () => {
   const getValidV2TokensList = async () => {
     const allTokens = data?.current_token_ownerships_v2_aggregate.nodes
     setTokens(allTokens)
+    setTokenBalances(allTokens)
   }
 
   useEffect(() => {
-    // for tokenV2
     if (data?.current_token_ownerships_v2_aggregate) {
       getValidV2TokensList()
     }
