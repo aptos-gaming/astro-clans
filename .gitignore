@@ -1,6 +1,8 @@
 frontend/node_modules
 .aptos
-coreMechanics/build
-mintCoins/build
+move/staking/build
+move/pve/build
+move/swap/build
+
 
 .DS_Store

@@ -8,6 +8,10 @@ body {
   padding-right: 10%;
 }
 
+#root {
+  margin-top: 16px;
+}
+
 label, h3, p {
   color: white !important;
 }
@@ -281,4 +285,8 @@ input::-webkit-inner-spin-button {
 
 .homePage .buttons button:last-child {
   margin-top: 1rem;
+}
+
+.ant-tabs-tab {
+  color: white;
 }
