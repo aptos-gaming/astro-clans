@@ -5,7 +5,6 @@ import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { AptosClient } from 'aptos'
 import Decimal from 'decimal.js'
 import { useApolloClient } from '@apollo/client'
-import { toast } from 'react-toastify'
 
 import {
   CreateEnemyLevelForm,
@@ -14,15 +13,16 @@ import {
   AllContractsTable,
   AllEnemyLevelsTable,
   UnitsList,
+  AttackEnemyModal,
 } from './components'
-
-import useCoinBalances from './context/useCoinBalances';
-import { CoinBalancesQuery } from './components/CoinBalance';
-
+import { Enemy, Unit } from './types'
+import useCoinBalances from './context/useCoinBalances'
+import { CoinBalancesQuery } from './components/CoinBalance'
 import CONFIG from "./config.json"
 
 const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
 const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
+
 const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
 const provider = new Provider(CONFIG.network === "devnet" ? Network.DEVNET : Network.TESTNET)
 
@@ -33,17 +33,6 @@ type TypeInfo = {
   account_address: string,
   module_name: string,
   struct_name: string,
-}
-
-export type EnemyLevel = {
-  key: string,
-  value: {
-    name: string,
-    attack: string,
-    health: string,
-    reward_coin_types: Array<string>,
-    reward_coin_amounts: Array<string>,
-  }
 }
 
 export type Contract = {
@@ -57,18 +46,6 @@ export type Contract = {
   }
 }
 
-export type Unit = {
-  key: string,
-  value: {
-    name: string,
-    description: string,
-    image_url: string,
-    attack: string,
-    health: string,
-    linked_coin_type: string,
-  }
-}
-
 const PvELayout = () => {
   const { coinBalances } = useCoinBalances()
   const { account, signAndSubmitTransaction } = useWallet();
@@ -77,13 +54,12 @@ const PvELayout = () => {
   const [maxUnits, setMaxUnits] = useState(0)
   const [unitsList, setUnitsList] = useState<Array<Unit>>([])
   const [contractsList, setContractsList] = useState<Array<Contract>>([])
-  const [enemyLevelsList, setEnemyLevelsList] = useState<Array<EnemyLevel>>([])
+  const [enemyLevelsList, setEnemyLevelsList] = useState<Array<Enemy>>([])
   const [selectedContract, setSelectedContract] = useState<any>()
-  const [selectedLevel, setSelectedLevel] = useState<{
+  const [selectedEnemy, setSelectedEnemy] = useState<{
     levelId: string, attack: string, health: string, name: string, rewardCoinTypes: Array<string>,
   } | null>(null)
   const [numberOfUnits, setNumberOfUnits] = useState<number>(1)
-  const [unitsForAttack, setUnitsForAttack] = useState<any>({})
 
   const getUnitsList = async () => {
     const payload = {
@@ -208,12 +184,12 @@ const PvELayout = () => {
     }
   }
 
-  const onAttackEnemy = async () => {
+  const onAttackEnemy = async (unitsForAttack: any) => {
     const unitType1 = String(Object.values(unitsForAttack)[0])?.split("-")[1]
     const unitId1 = Object.keys(unitsForAttack)[0]
     const numberOfUnits1ForAttack = unitsForAttack[unitId1].split("-")[0]
 
-    if (!unitType1 || !unitId1 || !selectedLevel) return
+    if (!unitType1 || !unitId1 || !selectedEnemy) return
 
     let numberOfUnitTypes = 0
     const unitValues = Object.values(unitsForAttack)
@@ -223,8 +199,8 @@ const PvELayout = () => {
       }
     })
 
-    const payloadTypeArgs = [...selectedLevel?.rewardCoinTypes, unitType1]
-    const payloadArgs = [selectedLevel?.levelId, numberOfUnits1ForAttack * (10 ** Decimals)]
+    const payloadTypeArgs = [...selectedEnemy?.rewardCoinTypes, unitType1]
+    const payloadArgs = [selectedEnemy?.levelId, numberOfUnits1ForAttack * (10 ** Decimals)]
 
     let unitType2, unitId2, numberOfUnits2ForAttack
 
@@ -240,11 +216,11 @@ const PvELayout = () => {
 
     let attackType
 
-    if (selectedLevel.rewardCoinTypes.length > 1 && numberOfUnitTypes > 1) {
+    if (selectedEnemy.rewardCoinTypes.length > 1 && numberOfUnitTypes > 1) {
       attackType = "attack_enemy_with_two_units_two_reward"
-    } else if (selectedLevel.rewardCoinTypes.length === 1 && numberOfUnitTypes > 1) {
+    } else if (selectedEnemy.rewardCoinTypes.length === 1 && numberOfUnitTypes > 1) {
       attackType = "attack_enemy_with_two_units_one_reward"
-    } else if (selectedLevel.rewardCoinTypes.length === 1 && numberOfUnitTypes === 1) {
+    } else if (selectedEnemy.rewardCoinTypes.length === 1 && numberOfUnitTypes === 1) {
       attackType = "attack_enemy_with_one_unit_one_reward"
     } else {
       attackType = "attack_enemy_with_one_unit_two_reward"
@@ -265,7 +241,7 @@ const PvELayout = () => {
       await client.waitForTransactionWithResult(tx.hash)
       getContractsList()
       setSelectedContract('')
-      setSelectedLevel(null)
+      setSelectedEnemy(null)
       await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
     } catch (e) {
       console.log("ERROR during attack enemy")
@@ -293,33 +269,6 @@ const PvELayout = () => {
     }
   }, [selectedContract])
 
-  useEffect(() => {
-    if (!selectedLevel) {
-      setUnitsForAttack({})
-    }
-  }, [selectedLevel])
-
-  const getTotalValues = (): { health: number, attack: number } => {
-    let totalAttack = 0
-    let totalHealth = 0
-    const unitsForAttackKeys = Object.keys(unitsForAttack)
-
-    unitsForAttackKeys.forEach((unitKey: any) => {
-      const unitData = unitsList.find((unit) => unit.key === String(unitKey))
-      const numberOfUnits = unitsForAttack[unitKey] as any
-
-      if (!numberOfUnits) return
-
-      totalAttack += numberOfUnits?.split('-')[0] * Number(unitData?.value.attack)
-      totalHealth += numberOfUnits?.split('-')[0] * Number(unitData?.value.health)
-    })
-
-    return {
-      health: totalHealth,
-      attack: totalAttack,
-    }
-  }
-
   return (
     <div>
       {coinBalances.length === 0 && (
@@ -344,64 +293,17 @@ const PvELayout = () => {
       />
       <AllEnemyLevelsTable
         levels={enemyLevelsList}
-        onSelectedLevel={setSelectedLevel}
+        onSelectedLevel={setSelectedEnemy}
         onRemoveEnemyLevel={onRemoveEnemyLevel}
       />
       <div className="divider" />
       {/* Modal to attack PvE enemy */}
-      <Modal
-        title={`Attack ${selectedLevel?.name}`}
-        open={!!selectedLevel}
-        footer={null}
-        onCancel={() => setSelectedLevel(null)}
-      >
-        <>
-          {unitsList.length && unitsList.map((unit: Unit) => {
-            const unitCoinType = unit.value.linked_coin_type
-            const unitCoinData = coinBalances.find((coinBalance) => coinBalance.coin_type === unitCoinType)
-            if (!unitCoinData) return
-            const unitBalance = unitCoinData?.amount / 10 ** Decimals
-
-            return (
-              <div key={unit.key} className="unit-selection-slider">
-                <span>{unit.value.name}</span>
-                <Row>
-                  <Col style={{width: '75%', marginRight: '1rem' }}>
-                    <Slider
-                      min={0}
-                      max={unitBalance}
-                      value={unitsForAttack[unit.key]?.split("-")[0]}
-                      onChange={(value) => setUnitsForAttack({ ...unitsForAttack, [unit.key]: `${value}-${unit.value.linked_coin_type}`})}
-                      marks={{
-                        0: '0',
-                        [unitBalance]: unitBalance
-                      }}
-                      trackStyle={{ height: '5px', backgroundColor: '#1677ff' }}
-                    />
-                  </Col>
-                  <Col span={3}>
-                    <InputNumber
-                      value={unitsForAttack[unit.key]?.split("-")[0]}
-                      onChange={(value) => setUnitsForAttack({ ...unitsForAttack, [unit.key]: `${value}-${unit.value.linked_coin_type}`})}
-                    />
-                  </Col>
-                </Row>
-              </div>
-            )}
-          )}
-          <p className="black-text">Total Units: {Number(Object.values(unitsForAttack).reduce((acc: any, value: any) => acc + Number(value.split('-')[0]), 0))}</p>
-          <p className="black-text">Total Attack: {getTotalValues().attack} (⚔️)</p>
-          <p className="black-text">Total Health: {getTotalValues().health} (❤️)</p>
-          <div className="buy-units-buttons">
-            <Button onClick={() => setSelectedLevel(null)}>
-              Cancel
-            </Button>
-            <Button type="primary" onClick={onAttackEnemy}>
-              Attack
-            </Button>
-          </div>
-        </>
-      </Modal>
+      <AttackEnemyModal
+        onCancel={() => setSelectedEnemy(null)}
+        unitsList={unitsList}
+        selectedEnemy={selectedEnemy}
+        onAttackEnemy={onAttackEnemy}
+      />
       {/* Modal to buy Units */}
       <Modal
         title={`Buy ${selectedContract?.unitName}'s`}

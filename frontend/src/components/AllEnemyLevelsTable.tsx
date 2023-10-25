@@ -2,11 +2,11 @@ import React from 'react'
 import { Button, Table } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 
-import { EnemyLevel } from '../PvELayout';
+import { Enemy } from '../types';
 const { Column } = Table;
 
 interface AllEnemyLevelsTableProps {
-  levels: Array<EnemyLevel>,
+  levels: Array<Enemy>,
   onSelectedLevel: (levelData: any) => void,
   onRemoveEnemyLevel: (levelId: string) => Promise<void>,
 }
@@ -17,7 +17,7 @@ const AllEnemyLevelsTable = ({ levels, onSelectedLevel, onRemoveEnemyLevel }: Al
 
   return (
     <div style={{ marginBottom: '2rem' }}>
-      <h3>All Enemy Levels by Creator {account?.address}</h3>
+      <h3>All Enemies by Creator {account?.address}</h3>
       <Table
         dataSource={levels || []}
         onRow={(record, _index) => ({ onClick: () => {

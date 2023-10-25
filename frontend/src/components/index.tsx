@@ -1,16 +1,18 @@
-import AllContractsTable from "./AllContractsTable";
-import AllEnemyLevelsTable from "./AllEnemyLevelsTable";
-import AllPairsTable from "./AllPairsTable";
-import CoinBalance from "./CoinBalance";
-import CreateEnemyLevelForm from "./PvEForms/CreateEnemyLevelForm";
-import { CreatePairForm } from "./DexForms/CreatePairForm";
-import CreateUnitContractForm from "./PvEForms/CreateUnitContractForm";
-import CreateUnitForm from "./PvEForms/CreateUnitForm";
-import EventsTable from "./EventsTable";
-import { SwapEventsTable } from "./SwapEventsTable";
-import { TokensList } from "./TokensList";
-import UnitsList from "./UnitsList";
-import WalletConnect from "./WalletConnect";
+import AllContractsTable from "./AllContractsTable"
+import AllEnemyLevelsTable from "./AllEnemyLevelsTable"
+import AllPairsTable from "./AllPairsTable"
+import CoinBalance from "./CoinBalance"
+import CreateEnemyLevelForm from "./PvEForms/CreateEnemyLevelForm"
+import { CreatePairForm } from "./DexForms/CreatePairForm"
+import CreateUnitContractForm from "./PvEForms/CreateUnitContractForm"
+import CreateUnitForm from "./PvEForms/CreateUnitForm"
+import EventsTable from "./EventsTable"
+import { SwapEventsTable } from "./SwapEventsTable"
+import { TokensList } from "./TokensList"
+import { EnemiesList } from "./EnemiesList"
+import AttackEnemyModal from "./AttackEnemyModal"
+import UnitsList from "./UnitsList"
+import WalletConnect from "./WalletConnect"
 
 export {
   AllContractsTable,
@@ -24,6 +26,8 @@ export {
   EventsTable,
   SwapEventsTable,
   TokensList,
+  EnemiesList,
   UnitsList,
   WalletConnect,
+  AttackEnemyModal,
 }

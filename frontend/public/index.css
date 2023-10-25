@@ -290,3 +290,16 @@ input::-webkit-inner-spin-button {
 .ant-tabs-tab {
   color: white;
 }
+
+.tip-text {
+  color: white;
+  font-size: 12px;
+}
+
+.enemyItem:hover {
+  cursor: pointer;
+}
+
+.enemyItem .itemDetails {
+  text-align: center;
+}

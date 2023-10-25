@@ -27,22 +27,23 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
   const [form] = Form.useForm()
   const { coinBalances } = useCoinBalances()
 
-  const [name, setName] = useState<string>('Barbarian Level 1')
+  const [name, setName] = useState<string>('Starfire Marauder')
   const [attack, setAttack] = useState(10)
   const [health, setHealth] = useState(10)
+  const [imageUrl, setImageUrl] = useState('https://github.com/aptos-gaming/astro-clans/blob/master/frontend/public/pirate1.png?raw=true')
   const [rewardCoin1Amount, setRewardCoin1Amount] = useState(100)
   const [rewardCoin2Amount, setRewardCoin2Amount] = useState(100)
   const [selectedResourceType, setSelectedResourceType] = useState<Array<string>>([])
 
   const onCreateLevel = async () => {
-    if (!name || !attack || !health || !rewardCoin1Amount || (selectedResourceType.length > 1 && !rewardCoin2Amount)) {
+    if (!name || !attack || !health || !rewardCoin1Amount || (selectedResourceType.length > 1 && !rewardCoin2Amount) || !imageUrl) {
       alert("Missing required fields")
       return
     }
 
     let enemyLevelType = selectedResourceType.length === 1 ? "create_enemy_level" : "create_enemy_level_with_two_reward_coins"
 
-    const payloadArgs = [name, attack, health, rewardCoin1Amount]
+    const payloadArgs = [name, attack, health, imageUrl, rewardCoin1Amount]
     if (selectedResourceType.length > 1) {
       payloadArgs.push(rewardCoin2Amount)
     }
@@ -51,7 +52,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
       type: "entry_function_payload",
       function: `${CONFIG.pveModule}::${PackageName}::${enemyLevelType}`,
       type_arguments: [...selectedResourceType],
-      // name: String, attack: u64, health: u64, reward_coin_1_amount: u64 / reward_coin_2_amount: u64,
+      // name: String, attack: u64, health: u64, image_url: String, reward_coin_1_amount: u64 / reward_coin_2_amount: u64
       arguments: payloadArgs
     }
     try {
@@ -64,6 +65,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
       setSelectedResourceType([])
       setRewardCoin1Amount(0)
       setRewardCoin2Amount(0)
+      setImageUrl('')
     } catch (e) {
       console.log("ERROR during create new enemy level")
       console.log(e)
@@ -72,7 +74,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
 
   return (
     <Form form={form} className="create-unit-form" {...layout}>
-      <h3>Create new Enemy Level:</h3>
+      <h3>Create new Enemy:</h3>
       <Form.Item style={{ marginTop: '1rem !important' }} label="Name">
         <Input
           value={name}
@@ -96,7 +98,17 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
           placeholder="Enemy Health"
         />
       </Form.Item>
-      <Form.Item label="Select Resource:">
+      <Form.Item label="Image">
+        <Input
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+          placeholder="Enemy Image"
+        />
+        {imageUrl ? (
+          <img style={{ width: '250px', height: '250px'}} src={imageUrl} alt="enemy view" />
+        ) : null}
+      </Form.Item>
+      <Form.Item label="Select Resource for Reward:">
         <Select
           mode="multiple"
           placeholder="Resource for reward"
@@ -136,7 +148,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
         </Form.Item>
       )}
       <Form.Item style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center'}}>
-        <Button onClick={onCreateLevel} type="primary">Create Level</Button>
+        <Button onClick={onCreateLevel} type="primary">Create Enemy</Button>
       </Form.Item>
     </Form>
   )
