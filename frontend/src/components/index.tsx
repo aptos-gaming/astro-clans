@@ -2,15 +2,17 @@ import AllContractsTable from "./AllContractsTable"
 import AllEnemyLevelsTable from "./AllEnemyLevelsTable"
 import AllPairsTable from "./AllPairsTable"
 import CoinBalance from "./CoinBalance"
-import CreateEnemyLevelForm from "./PvEForms/CreateEnemyLevelForm"
+import CreateEnemyForm from "./PvEForms/CreateEnemyForm"
 import { CreatePairForm } from "./DexForms/CreatePairForm"
 import CreateUnitContractForm from "./PvEForms/CreateUnitContractForm"
 import CreateUnitForm from "./PvEForms/CreateUnitForm"
 import EventsTable from "./EventsTable"
 import { SwapEventsTable } from "./SwapEventsTable"
 import { TokensList } from "./TokensList"
-import { EnemiesList } from "./EnemiesList"
+import EnemiesList from "./EnemiesList"
+import ContractsList from "./ContractsList"
 import AttackEnemyModal from "./AttackEnemyModal"
+import BuyUnitsModal from "./BuyUnitsModal"
 import UnitsList from "./UnitsList"
 import WalletConnect from "./WalletConnect"
 
@@ -19,7 +21,7 @@ export {
   AllEnemyLevelsTable,
   AllPairsTable,
   CoinBalance,
-  CreateEnemyLevelForm,
+  CreateEnemyForm,
   CreatePairForm,
   CreateUnitContractForm,
   CreateUnitForm,
@@ -30,4 +32,6 @@ export {
   UnitsList,
   WalletConnect,
   AttackEnemyModal,
+  BuyUnitsModal,
+  ContractsList,
 }

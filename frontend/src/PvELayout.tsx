@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Row, Col, Button, Modal, Slider, InputNumber } from 'antd'
+import { Button } from 'antd'
 import { Provider, Network } from 'aptos'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { AptosClient } from 'aptos'
@@ -7,15 +7,16 @@ import Decimal from 'decimal.js'
 import { useApolloClient } from '@apollo/client'
 
 import {
-  CreateEnemyLevelForm,
+  CreateEnemyForm,
   CreateUnitForm,
   CreateUnitContractForm,
   AllContractsTable,
   AllEnemyLevelsTable,
   UnitsList,
   AttackEnemyModal,
+  BuyUnitsModal,
 } from './components'
-import { Enemy, Unit } from './types'
+import { Enemy, Unit, Contract } from './types'
 import useCoinBalances from './context/useCoinBalances'
 import { CoinBalancesQuery } from './components/CoinBalance'
 import CONFIG from "./config.json"
@@ -29,22 +30,6 @@ const provider = new Provider(CONFIG.network === "devnet" ? Network.DEVNET : Net
 const Decimals = 8
 const PackageName = "pve_battles"
 
-type TypeInfo = {
-  account_address: string,
-  module_name: string,
-  struct_name: string,
-}
-
-export type Contract = {
-  key: string,
-  value: {
-    unit_id: string,
-    unit_type: string,
-    coin_address: string,
-    resource_type_info: TypeInfo,
-    fixed_price: string,
-  }
-}
 
 const PvELayout = () => {
   const { coinBalances } = useCoinBalances()
@@ -288,7 +273,7 @@ const PvELayout = () => {
         onRemoveContract={onRemoveContract}
       />
       <div className="divider" />
-      <CreateEnemyLevelForm
+      <CreateEnemyForm
         getEnemysList={getEnemysList}
       />
       <AllEnemyLevelsTable
@@ -305,40 +290,12 @@ const PvELayout = () => {
         onAttackEnemy={onAttackEnemy}
       />
       {/* Modal to buy Units */}
-      <Modal
-        title={`Buy ${selectedContract?.unitName}'s`}
-        open={!!selectedContract}
-        footer={null}
+      <BuyUnitsModal
+        maxUnits={maxUnits}
+        onBuyUnits={onBuyUnits}
         onCancel={() => setSelectedContract(null)}
-      >
-        <Row>
-          <Col style={{width: '75%', marginRight: '1rem' }}>
-            <Slider
-              min={1}
-              max={maxUnits}
-              value={numberOfUnits}
-              onChange={setNumberOfUnits}
-              marks={{
-                1: '1',
-                [maxUnits]: maxUnits
-              }}
-              trackStyle={{ height: '5px', backgroundColor: '#1677ff' }}
-            />
-          </Col>
-          <Col span={3}>
-            <InputNumber value={numberOfUnits} onChange={(value) => setNumberOfUnits(Number(value))} />
-          </Col>
-        </Row>
-        <p className="black-text">Total Cost: {numberOfUnits * selectedContract?.fixedPrice} {selectedContract?.resourceName}</p>
-        <div className="buy-units-buttons">
-          <Button onClick={() => setSelectedContract(null)}>
-            Cancel
-          </Button>
-          <Button style={{ marginLeft: '8px'}} type="primary" onClick={onBuyUnits}>
-            Buy
-          </Button>
-        </div>
-      </Modal>
+        selectedContract={selectedContract}
+      />
     </div>
   );
 }

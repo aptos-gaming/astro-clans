@@ -21,3 +21,20 @@ export type Unit = {
     linked_coin_type: string,
   }
 }
+
+type TypeInfo = {
+  account_address: string,
+  module_name: string,
+  struct_name: string,
+}
+
+export type Contract = {
+  key: string,
+  value: {
+    unit_id: string,
+    unit_type: string,
+    coin_address: string,
+    resource_type_info: TypeInfo,
+    fixed_price: string,
+  }
+}

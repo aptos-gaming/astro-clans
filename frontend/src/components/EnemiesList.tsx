@@ -20,7 +20,7 @@ interface EnemiesListProps {
   setSelectedEnemy: (newEnemy: any) => void
 }
 
-export const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
+const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
   const [enemiesList, setEnemiesList] = useState<Enemy[]>([])
   const { account } = useWallet()
 
@@ -34,7 +34,6 @@ export const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
 
     try {
       const allEnemyLevelsResponse: any = await provider.view(payload)
-      console.log("ENEMY: ", enemiesList)
       setEnemiesList(allEnemyLevelsResponse[0].data)
     } catch(e) {
       console.log("ERROR during getting enemy levels list")
@@ -97,5 +96,6 @@ export const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
       <div className='divider' />
     </Col>
   );
-  
 }
+
+export default EnemiesList

@@ -16,8 +16,6 @@ const layout = {
   labelCol: { span: 3 },
 }
 
-const tempImageUrl = "https://i.pinimg.com/originals/4c/7b/f7/4c7bf7f83025e35ed2c11f7061a05481.jpg"
-
 interface CreateUnitFormProps {
   unitsList: Array<Unit>,
   getUnitsList: () => void;
@@ -30,7 +28,7 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
   const [name, setName] = useState<string>('Galactic Protector')
   const [symbol, setSymbol] = useState<string>('GPR')
   const [description, setDescription] = useState<string>('Galactic Protector Description')
-  const [imageUrl, setImageUrl] = useState<string>(tempImageUrl)
+  const [imageUrl, setImageUrl] = useState<string>('https://github.com/aptos-gaming/on-chain-pve-battles/blob/main/frontend/public/battleship.png?raw=true')
 
   const [attack, setAttack] = useState(10)
   const [health, setHealth] = useState(10)
@@ -72,6 +70,7 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
       setName('')
       setDescription('')
       setImageUrl('')
+      setSymbol('')
     } catch (e) {
       console.log("ERROR during create new unit")
       console.log(e)

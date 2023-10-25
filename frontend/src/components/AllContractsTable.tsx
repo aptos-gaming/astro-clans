@@ -2,8 +2,7 @@ import React from 'react'
 import { Button, Table } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 
-import { Contract } from '../PvELayout'
-import { Unit } from '../types'
+import { Unit, Contract } from '../types'
 
 const { Column } = Table;
 

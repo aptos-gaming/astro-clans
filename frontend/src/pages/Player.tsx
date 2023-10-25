@@ -5,11 +5,18 @@ import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
 import { Provider, Network, AptosClient } from 'aptos'
 import Tippy from '@tippyjs/react'
+import Decimal from 'decimal.js'
 
 import useTokenBalances from '../context/useTokenBalances'
 import useCoinBalances from '../context/useCoinBalances'
 import { CoinBalancesQuery } from '../components/CoinBalance'
-import { EnemiesList, AttackEnemyModal, TokensList } from '../components'
+import {
+  EnemiesList,
+  AttackEnemyModal,
+  TokensList,
+  BuyUnitsModal,
+  ContractsList,
+} from '../components'
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
 import { Unit } from '../types'
 import CONFIG from '../config.json'
@@ -32,6 +39,9 @@ const Player = () => {
   const [selectedEnemy, setSelectedEnemy] = useState<{
     levelId: string, attack: string, health: string, name: string, rewardCoinTypes: Array<string>,
   } | null>(null)
+  const [selectedContract, setSelectedContract] = useState<any>()
+  const [maxUnits, setMaxUnits] = useState(0)
+
 
   const onMintPlanet = async () => {
     const packageName = "staking"
@@ -163,13 +173,6 @@ const Player = () => {
     }
   }
 
-  useEffect(() => {
-    if (account) {
-      getCollectionOwnerAddress()
-      getUnitsList()
-    }
-  }, [account])
-
   const onAirdropResources = async () => {
     const packageName = "pve_battles"
   
@@ -192,6 +195,48 @@ const Player = () => {
       console.log(e)
     }
   }
+
+  const onBuyUnits = async (numberOfUnits: number) => {
+    const packageName = "pve_battles"
+
+    const payload = {
+      type: "entry_function_payload",
+      function: `${CONFIG.pveModule}::${packageName}::buy_units`,
+      // <CoinType, UnitType>
+      type_arguments: [selectedContract?.coinType, selectedContract.unitType],
+      // contract_id: u64, coins_amount: u64, number_of_units: u64
+      arguments: [selectedContract?.contractId, (numberOfUnits * 10 ** Decimals) * selectedContract?.fixedPrice, numberOfUnits]
+    }
+    try {
+      const tx = await signAndSubmitTransaction(payload)
+      await client.waitForTransactionWithResult(tx.hash)
+      setSelectedContract('')
+      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
+    } catch (e) {
+      console.log("ERROR during buy units tx")
+      console.log(e)
+    }
+  }
+
+  useEffect(() => {
+    if (account) {
+      getCollectionOwnerAddress()
+      getUnitsList()
+    }
+  }, [account])
+
+  useEffect(() => {
+    if (selectedContract) {
+      const contractResourceBalance = coinBalances?.find((coinBalance) => coinBalance.coin_info.name.includes(selectedContract?.resourceName))
+      if (!contractResourceBalance) return
+      
+      const fullResourceBalance = new Decimal(contractResourceBalance?.amount)
+      const validResourceBalance = fullResourceBalance.dividedBy(10 ** Decimals)
+      const validMaxAllowedUnits = validResourceBalance.dividedBy(selectedContract?.fixedPrice)
+      setMaxUnits(Math.floor(Number(validMaxAllowedUnits.toString())))
+    }
+  }, [selectedContract])
+
 
   return (
     <>
@@ -225,9 +270,16 @@ const Player = () => {
       <TokensList />
       <div className="divider" />
       {/* PvE UI */}
-      <span style={{ color: 'white'}}>After you collect some resources, you can hire units for fight</span>
-      {/* show UI to hire units */}
-      
+      <span style={{ color: 'white'}}>After you collect some resources, you can hire units to fight with pirates:</span>
+      {/* show UI to hire units and UnitsList*/}
+      <ContractsList setSelectedContract={setSelectedContract} />
+      <BuyUnitsModal
+        maxUnits={maxUnits}
+        onBuyUnits={onBuyUnits}
+        onCancel={() => setSelectedContract(null)}
+        selectedContract={selectedContract}
+      />
+
       <EnemiesList setSelectedEnemy={setSelectedEnemy} />
       <AttackEnemyModal
         onCancel={() => setSelectedEnemy(null)}
