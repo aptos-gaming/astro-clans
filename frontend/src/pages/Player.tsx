@@ -11,12 +11,15 @@ import { CoinBalancesQuery } from '../components/CoinBalance'
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
 import { TokensList } from '../components'
 import CONFIG from '../config.json'
+import Tippy from '@tippyjs/react'
 
 const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
 const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
 
 const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
 const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET);
+
+const Decimals = 8
 
 const Player = () => {
   const { coinBalances } = useCoinBalances()
@@ -27,6 +30,7 @@ const Player = () => {
 
   const onMintPlanet = async () => {
     const packageName = "staking"
+  
     if (!account) return
     if (!ownerAddress) {
       toast.error('No owner address')
@@ -98,29 +102,33 @@ const Player = () => {
       console.log("ERROR during mint coins")
       console.log(e)
     }
-    
   }
 
   return (
     <>
-      {tokenBalances && tokenBalances.length < 2 ? (
-        <Button
-          disabled={!account}
-          onClick={onMintPlanet}
-          type='primary'
-        >
-          Mint A Planet
-        </Button>
+      {/* allow mint token only if user hasnt any tokens or has less than 2 */}
+      {(tokenBalances && tokenBalances.length < 2) || tokenBalances.length === 0 ? (
+        <Tippy content="Mint a planet with random level property">
+          <Button
+            onClick={onMintPlanet}
+            type='primary'
+          >
+            Mint A Planet
+          </Button>
+        </Tippy>
       ) : null}
-      {/* show only if user dont have some minimal resources on the balance */}
-      <Button
-        disabled={!account}
-        onClick={onAirdropResources}
-        style={{ marginLeft: '8px' }}
-        type='primary'
-      >
-        Airdrop Resources
-      </Button>
+      {/* allow airdrop only if user hasnt any coins or has less then 1000 Minerals */}
+      {(coinBalances.length > 0 && coinBalances.find((coinBalance) => coinBalance.coin_info.name === 'Minerals' &&  coinBalance.amount < 1000 * 10 ** Decimals)) || coinBalances.length === 0 ? (
+        <Tippy content="Airdrop 10 000 Minerals and 10 000 Energy Crystals">
+          <Button
+            onClick={onAirdropResources}
+            style={{ marginLeft: '8px' }}
+            type='primary'
+          >
+            Airdrop Resources
+          </Button>
+        </Tippy>
+      ) : null}
       <TokensList />
     </>
   )

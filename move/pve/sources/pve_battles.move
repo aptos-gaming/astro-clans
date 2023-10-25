@@ -686,19 +686,17 @@ module owner_addr::pve_battles {
     );
   }
 
-  // used for testing
+  // used for airdrop new users
   public entry fun mint_coins(user: &signer) acquires AdminData {
     let user_addr = signer::address_of(user);
-
-    assert!(user_addr == @source_addr, E_INVALID_ADDRESS_FOR_MINT);
-
+    
     managed_coin::register<Minerals>(user);
     managed_coin::register<EnergyCrystals>(user);
 
     let resource_signer = get_resource_signer();
     
-    managed_coin::mint<Minerals>(&resource_signer, user_addr, 10000000000000);
-    managed_coin::mint<EnergyCrystals>(&resource_signer, user_addr, 10000000000000);
+    managed_coin::mint<Minerals>(&resource_signer, user_addr, 1000000000000);
+    managed_coin::mint<EnergyCrystals>(&resource_signer, user_addr, 1000000000000);
   }
 
   // return all units created by address
