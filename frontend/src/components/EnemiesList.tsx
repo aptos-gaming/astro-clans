@@ -61,6 +61,9 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
           })
         }}
       >
+        <div style={{ textAlign: 'center' }}>
+          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '18px', marginBottom: '4px' }}>{rowData.value.name}</span>
+        </div>
         <div className='enemyContainer'>
           <img
             style={{ maxWidth: '250px' }}
@@ -69,7 +72,6 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
           />
         </div>
         <div className='itemDetails'>
-          <span style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '4px' }}>{rowData.value.name}</span>
           <span style={{ marginTop: '4px' }}>❤️: {rowData.value.health} | ⚔️: {rowData.value.attack}</span>
           <div style={{ border: '1px solid #ccc', marginTop: '12px', borderRadius: '16px'}}>
             <p>

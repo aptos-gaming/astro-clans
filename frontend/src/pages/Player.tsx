@@ -266,13 +266,14 @@ const Player = () => {
         ) : null}
       </div>
       {/* Staking UI */}
-      <span style={{ color: 'white'}}>To gain more resources you can stake your Planet, reward depends on Planet level, so you can also upgrade Planet to increase resource income</span>
+      <span className='white-text'>To gain more resources you can stake your Planet, reward depends on Planet level, so you can also upgrade Planet to increase resource income</span>
       <TokensList />
       <div className="divider" />
       {/* PvE UI */}
-      <span style={{ color: 'white'}}>After you collect some resources, you can hire units to fight with pirates:</span>
+      <span className='white-text'>After you collect some resources, you can hire units to fight with pirates:</span>
       {/* show UI to hire units and UnitsList*/}
-      <ContractsList setSelectedContract={setSelectedContract} />
+      <h2 className='white-text'>Units to Buy:</h2>
+      <ContractsList onSelectedContract={setSelectedContract} unitsList={unitsList} />
       <BuyUnitsModal
         maxUnits={maxUnits}
         onBuyUnits={onBuyUnits}
@@ -280,6 +281,7 @@ const Player = () => {
         selectedContract={selectedContract}
       />
 
+      <h2 className='white-text'>Enemies to Attack:</h2>
       <EnemiesList setSelectedEnemy={setSelectedEnemy} />
       <AttackEnemyModal
         onCancel={() => setSelectedEnemy(null)}

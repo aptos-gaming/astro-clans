@@ -13,7 +13,7 @@ interface AllContractsTableProps {
   onSelectedContract: (contractData: any) => void,
 }
 
-const hexToText = (hexString: string): string => {
+export const hexToText = (hexString: string): string => {
   const cleanedHexString = hexString.startsWith("0x") ? hexString.slice(2) : hexString
   const bytes = []
 

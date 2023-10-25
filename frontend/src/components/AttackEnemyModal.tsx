@@ -97,7 +97,7 @@ const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel, onAttackEnemy }:
           </Button>
           <Button
             type="primary"
-            disabled={unitsForAttack.length !== 0}
+            disabled={unitsForAttack.length === 0}
             style={{ marginLeft: '8px'}}
             onClick={() => onAttackEnemy(unitsForAttack)}
           >
