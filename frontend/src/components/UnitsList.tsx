@@ -27,7 +27,10 @@ const UnitsList = ({ unitsList }: UnitsListProps) => (
   <div>
     <h3>All created units:</h3>
     <div className="units-list">
-      {unitsList.length > 0 && unitsList.map((unitData) => <UnitRow key={unitData.key} unitData={unitData.value}/>)}
+      {unitsList.length > 0 ? unitsList.map((unitData) => <UnitRow key={unitData.key} unitData={unitData.value}/>
+      ) : (
+        <span className="white-text">You dont have any units, yet</span>
+      )}
     </div>
   </div>
 )

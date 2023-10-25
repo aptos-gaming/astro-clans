@@ -6,6 +6,11 @@ body {
   background: url('https://opengameart.org/sites/default/files/bg_space_seamless_1.png');
   padding-left: 10%;
   padding-right: 10%;
+  -ms-overflow-style: none;
+	scrollbar-width: none;
+	&::-webkit-scrollbar {
+		display: none;
+	}
 }
 
 #root {
@@ -287,7 +292,7 @@ input::-webkit-inner-spin-button {
   margin-top: 1rem;
 }
 
-.ant-tabs-tab {
+.ant-tabs-tab, .white-text {
   color: white;
 }
 
@@ -302,4 +307,8 @@ input::-webkit-inner-spin-button {
 
 .enemyItem .itemDetails {
   text-align: center;
+}
+
+.buy-units-buttons, .black-text {
+  color: black !important;
 }

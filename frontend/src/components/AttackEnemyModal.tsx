@@ -52,7 +52,10 @@ const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel, onAttackEnemy }:
       onCancel={onCancel}
     >
       <>
-        {unitsList.length && unitsList.map((unit: Unit) => {
+        {unitsList.length === 0 ? (
+          <span>You dont have any units, buy some and then attack</span>
+        ): null}
+        {unitsList.length > 0 ? unitsList.map((unit: Unit) => {
           const unitCoinType = unit.value.linked_coin_type
           const unitCoinData = coinBalances.find((coinBalance) => coinBalance.coin_type === unitCoinType)
           if (!unitCoinData) return
@@ -84,7 +87,7 @@ const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel, onAttackEnemy }:
               </Row>
             </div>
           )}
-        )}
+        ): null}
         <p className="black-text">Total Units: {Number(Object.values(unitsForAttack).reduce((acc: any, value: any) => acc + Number(value.split('-')[0]), 0))}</p>
         <p className="black-text">Total Attack: {getTotalValues().attack} (⚔️)</p>
         <p className="black-text">Total Health: {getTotalValues().health} (❤️)</p>
@@ -92,7 +95,12 @@ const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel, onAttackEnemy }:
           <Button onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="primary" onClick={() => onAttackEnemy(unitsForAttack)}>
+          <Button
+            type="primary"
+            disabled={unitsForAttack.length !== 0}
+            style={{ marginLeft: '8px'}}
+            onClick={() => onAttackEnemy(unitsForAttack)}
+          >
             Attack
           </Button>
         </div>

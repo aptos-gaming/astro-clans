@@ -228,7 +228,6 @@ const Player = () => {
       <span style={{ color: 'white'}}>After you collect some resources, you can hire units for fight</span>
       {/* show UI to hire units */}
       
-      {/* show 3 enemy ships based on enemyLevels */}
       <EnemiesList setSelectedEnemy={setSelectedEnemy} />
       <AttackEnemyModal
         onCancel={() => setSelectedEnemy(null)}

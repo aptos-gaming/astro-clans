@@ -46,6 +46,7 @@ module owner_addr::pve_battles {
     name: String,
     attack: u64,
     health: u64,
+    image_url: String,
     reward_coin_types: vector<String>,
     reward_coin_amounts: vector<u64>,
   }
@@ -177,17 +178,20 @@ module owner_addr::pve_battles {
 
   // create new unit (coin) and push to Units map
   public entry fun create_unit<CoinType>(
-    creator: &signer, name: String, description: String, image_url: String, attack: u64, health: u64,
+    creator: &signer, name: String, symbol: String, description: String, image_url: String, attack: u64, health: u64,
   ) acquires Units, AdminData {
     let unit_name_in_bytes = bcs::to_bytes(&name);
     vector::remove(&mut unit_name_in_bytes, 0);
+
+    let unit_symbol_in_bytes = bcs::to_bytes(&symbol);
+    vector::remove(&mut unit_symbol_in_bytes, 0);
 
     let resource_signer = get_resource_signer();
 
     managed_coin::initialize<UnitCoin<CoinType>>(
       &resource_signer,
       unit_name_in_bytes,
-      unit_name_in_bytes,
+      unit_symbol_in_bytes,
       8,
       true,
     );
@@ -285,7 +289,7 @@ module owner_addr::pve_battles {
 
   // add new enemy level
   public entry fun create_enemy_level<CoinType>(
-    creator: &signer, name: String, attack: u64, health: u64, reward_coin_amount: u64,
+    creator: &signer, name: String, attack: u64, health: u64, image_url: String, reward_coin_amount: u64,
   ) acquires EnemyLevels {
     let creator_addr = signer::address_of(creator);
 
@@ -308,11 +312,12 @@ module owner_addr::pve_battles {
       health,
       reward_coin_types,
       reward_coin_amounts,
+      image_url,
     });
   }
 
   public entry fun create_enemy_level_with_two_reward_coins<CoinType1, CoinType2>(
-    creator: &signer, name: String, attack: u64, health: u64, reward_coin_1_amount: u64, reward_coin_2_amount: u64,
+    creator: &signer, name: String, attack: u64, health: u64, image_url: String, reward_coin_1_amount: u64, reward_coin_2_amount: u64,
   ) acquires EnemyLevels {
     let creator_addr = signer::address_of(creator);
 
@@ -339,6 +344,7 @@ module owner_addr::pve_battles {
       health,
       reward_coin_types,
       reward_coin_amounts,
+      image_url,
     });
   }
 

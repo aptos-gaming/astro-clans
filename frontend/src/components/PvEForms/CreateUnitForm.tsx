@@ -27,8 +27,9 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
   const { signAndSubmitTransaction } = useWallet()
   const [form] = Form.useForm()
   
-  const [name, setName] = useState<string>('Archer')
-  const [description, setDescription] = useState<string>('Archer Desc')
+  const [name, setName] = useState<string>('Galactic Protector')
+  const [symbol, setSymbol] = useState<string>('GPR')
+  const [description, setDescription] = useState<string>('Galactic Protector Description')
   const [imageUrl, setImageUrl] = useState<string>(tempImageUrl)
 
   const [attack, setAttack] = useState(10)
@@ -62,7 +63,7 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
       type: "entry_function_payload",
       function: `${CONFIG.pveModule}::${PackageName}::create_unit`,
       type_arguments: [coinType],
-      arguments: [name, description, imageUrl, attack, health]
+      arguments: [name, symbol, description, imageUrl, attack, health]
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
@@ -84,6 +85,13 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Unit Name"
+        />
+      </Form.Item>
+      <Form.Item label="Symbol">
+        <Input
+          value={symbol}
+          onChange={(e) => setSymbol(e.target.value)}
+          placeholder="Unit Symbol (should be short)"
         />
       </Form.Item>
       <Form.Item label="Description">

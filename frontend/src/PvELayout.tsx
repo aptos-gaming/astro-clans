@@ -334,7 +334,7 @@ const PvELayout = () => {
           <Button onClick={() => setSelectedContract(null)}>
             Cancel
           </Button>
-          <Button type="primary" onClick={onBuyUnits}>
+          <Button style={{ marginLeft: '8px'}} type="primary" onClick={onBuyUnits}>
             Buy
           </Button>
         </div>

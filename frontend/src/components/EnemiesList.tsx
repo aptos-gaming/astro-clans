@@ -52,7 +52,15 @@ export const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
     return (
       <div
         className='enemyItem'
-        onClick={() => setSelectedEnemy({ ...rowData })}
+        onClick={() => {
+          setSelectedEnemy({
+            levelId: rowData.key,
+            name: rowData.value.name,
+            attack: rowData.value.attack,
+            health: rowData.value.health,
+            rewardCoinTypes: rowData.value.reward_coin_types,
+          })
+        }}
       >
         <div className='enemyContainer'>
           <img
