@@ -9,6 +9,7 @@ import Decimal from 'decimal.js'
 
 import useTokenBalances from '../context/useTokenBalances'
 import useCoinBalances from '../context/useCoinBalances'
+import useSelectedToken from '../context/useSelectedToken'
 import { CoinBalancesQuery } from '../components/CoinBalance'
 import {
   EnemiesList,
@@ -16,6 +17,7 @@ import {
   TokensList,
   BuyUnitsModal,
   ContractsList,
+  StakePlanetModal,
 } from '../components'
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
 import { Unit } from '../types'
@@ -32,6 +34,7 @@ const Decimals = 8
 const Player = () => {
   const { coinBalances } = useCoinBalances()
   const { tokenBalances } = useTokenBalances()
+  const { selectedToken, setSelectedToken } = useSelectedToken()
   const [ownerAddress, setOwnerAddress] = useState('')
   const { account, signAndSubmitTransaction } = useWallet()
   const apolloClient = useApolloClient()
@@ -41,7 +44,8 @@ const Player = () => {
   } | null>(null)
   const [selectedContract, setSelectedContract] = useState<any>()
   const [maxUnits, setMaxUnits] = useState(0)
-
+  const [unclaimedReward, setUnclaimedReward] = useState(0)
+  const [rewardCoinType, setRewardCoinType] = useState('')
 
   const onMintPlanet = async () => {
     const packageName = "staking"
@@ -218,12 +222,146 @@ const Player = () => {
     }
   }
 
+  const onStakeToken = async () => {
+    const packageName="staking"
+
+    const payload = {
+      type: "entry_function_payload",
+      function: `${CONFIG.stakingModule}::${packageName}::stake_token`,
+      type_arguments: [],
+      // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name, tokens
+      arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
+    }
+    try {
+      const tx = await signAndSubmitTransaction(payload)
+      setSelectedToken(null)
+      setUnclaimedReward(0)
+      await client.waitForTransactionWithResult(tx.hash)
+      await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
+    } catch (e) {
+      console.log("Error druing stake token tx")
+      console.log(e)
+    }
+  }
+
+  const onUnstakeToken = async () => {
+    const packageName="staking"
+
+    const payload = {
+      type: "entry_function_payload",
+      function: `${CONFIG.stakingModule}::${packageName}::unstake_token`,
+      type_arguments: [rewardCoinType],
+      // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name,
+      arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
+    }
+    try {
+      const tx = await signAndSubmitTransaction(payload)
+      setSelectedToken(null)
+      setUnclaimedReward(0)
+      await client.waitForTransactionWithResult(tx.hash)
+      await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
+    } catch (e) {
+      console.log("Error druing unstake token tx")
+      console.log(e)
+    }
+  }
+
+  const onClaimReward = async () => {
+    const packageName="staking"
+
+    const payload = {
+      type: "entry_function_payload",
+      function: `${CONFIG.stakingModule}::${packageName}::claim_reward`,
+      type_arguments: [rewardCoinType],
+      // staking_creator_addr, token_address, collection_name, token_name
+      arguments: [CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name],
+    }
+    try {
+      const tx = await signAndSubmitTransaction(payload)
+      setSelectedToken(null)
+      setUnclaimedReward(0)
+      await client.waitForTransactionWithResult(tx.hash)
+    } catch (e) {
+      console.log("Error druing claim reward tx")
+      console.log(e)
+    }
+  }
+
+
+  const getUnclaimedReward = async (token: any) => {
+    const packageName="staking"
+    const payload = {
+      function: `${CONFIG.stakingModule}::${packageName}::get_unclaimed_reward`,
+      type_arguments: [],
+      // staker_addr, staking_creator_addr, token_address, collection_name, token_name
+      arguments: [account?.address, CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
+    }
+
+    try {
+      const unclaimedReward = await provider.view(payload)
+      setUnclaimedReward(Number(unclaimedReward[0]) / 10 ** Decimals)
+    } catch(e) {
+      console.log("Error during getting unclaimed")
+      console.log(e)
+    }
+  }
+
+  const onLevelUpgrade = async () => {
+    const packageName = "staking"
+    const payload = {
+      type: "entry_function_payload",
+      function: `${CONFIG.stakingModule}::${packageName}::upgrade_token`,
+      type_arguments: [rewardCoinType],
+      // collection_owner, token address
+      arguments: [ownerAddress, selectedToken?.storage_id],
+    }
+    try {
+      const tx = await signAndSubmitTransaction(payload)
+      await client.waitForTransactionWithResult(tx.hash)
+      setSelectedToken(null)
+      setUnclaimedReward(0)
+      await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
+    } catch (e) {
+      console.log("ERROR during token upgrade")
+    }
+  }
+
+  const getRewardCoinType = async () => {
+    const packageName = "staking"
+    const payload = {
+      function: `${CONFIG.stakingModule}::${packageName}::get_reward_coin_type`,
+      type_arguments: [],
+      // collection_owner_address
+      arguments: [ownerAddress]
+    }
+
+    try {
+      const viewResponse = await provider.view(payload)
+      setRewardCoinType(String(viewResponse[0]))
+    } catch(e) {
+      console.log("Error during getting reward coin type addres")
+      console.log(e)
+    }
+  }
+
   useEffect(() => {
     if (account) {
       getCollectionOwnerAddress()
       getUnitsList()
     }
   }, [account])
+
+  useEffect(() => {
+    if (ownerAddress) {
+      getRewardCoinType()
+    }
+  }, [ownerAddress])
+
+  useEffect(() => {
+    if (selectedToken) {
+      getUnclaimedReward(selectedToken)
+    }
+  }, [selectedToken])
 
   useEffect(() => {
     if (selectedContract) {
@@ -268,6 +406,17 @@ const Player = () => {
       {/* Staking UI */}
       <span className='white-text'>To gain more resources you can stake your Planet, reward depends on Planet level, so you can also upgrade Planet to increase resource income</span>
       <TokensList />
+      <StakePlanetModal
+        unclaimedReward={unclaimedReward}
+        onClaimReward={onClaimReward}
+        onStakeToken={onStakeToken}
+        onUnstakeToken={onUnstakeToken}
+        onLevelUpgrade={onLevelUpgrade}
+        onHide={() => {
+          setSelectedToken(null)
+          setUnclaimedReward(0)  
+        }}
+      />
       <div className="divider" />
       {/* PvE UI */}
       <span className='white-text'>After you collect some resources, you can hire units to fight with pirates:</span>

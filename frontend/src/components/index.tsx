@@ -12,6 +12,7 @@ import { TokensList } from "./TokensList"
 import EnemiesList from "./EnemiesList"
 import ContractsList from "./ContractsList"
 import AttackEnemyModal from "./AttackEnemyModal"
+import StakePlanetModal from "./StakePlanetModal"
 import BuyUnitsModal from "./BuyUnitsModal"
 import UnitsList from "./UnitsList"
 import WalletConnect from "./WalletConnect"
@@ -34,4 +35,5 @@ export {
   AttackEnemyModal,
   BuyUnitsModal,
   ContractsList,
+  StakePlanetModal,
 }

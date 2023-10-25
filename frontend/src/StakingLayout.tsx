@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { Col, Button, Modal } from "antd";
+import { Col } from "antd";
 import { Network, Provider, AptosClient } from "aptos"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { useApolloClient } from '@apollo/client'
 import { toast } from 'react-toastify'
 
 import { AccountTokensV2WithDataQuery } from './components/TokensList'
-import CONFIG from "./config.json"
 import useSelectedToken from './context/useSelectedToken'
 import useCollectionOwner from './context/useCollectionOwner'
 import CreateCollectioForm from './components/StakingForms/CreateCollectionForm'
+import { StakePlanetModal } from './components'
 import InitStakingForm from './components/StakingForms/InitStakingForm'
+import CONFIG from "./config.json"
 
 const PackageName = "staking"
 
@@ -145,7 +146,7 @@ const StakingLayout = () => {
     }
   }
 
-  const onUnstakeStaking = async () => {
+  const onUnstakeToken = async () => {
     const payload = {
       type: "entry_function_payload",
       function: `${CONFIG.stakingModule}::${PackageName}::unstake_token`,
@@ -240,52 +241,17 @@ const StakingLayout = () => {
           createStaking={createStaking}
           isDisabled={!account?.address || !rewardCoinType}
         />
-        <Modal
-          title="Upgradable Staking Actions"
-          open={!!selectedToken}
-          footer={null}
-          onCancel={() => {
+        <StakePlanetModal
+          unclaimedReward={unclaimedReward}
+          onClaimReward={onClaimReward}
+          onStakeToken={onStakeToken}
+          onUnstakeToken={onUnstakeToken}
+          onLevelUpgrade={onLevelUpgrade}
+          onHide={() => {
             setSelectedToken(null)
             setUnclaimedReward(0)  
           }}
-        >
-          <div style={{ marginTop: '3rem' }}>
-            <Button
-              type="primary"
-              style={{ marginRight: '1rem'}}
-              onClick={() => selectedToken && onStakeToken()}
-              disabled={!selectedToken?.amount || !!unclaimedReward}
-            >
-              Stake
-            </Button>
-            <Button
-              type="primary"
-              style={{ marginRight: '1rem'}}
-              onClick={() => selectedToken && onUnstakeStaking()}
-              disabled={!unclaimedReward}
-            >
-              Unstake
-            </Button>
-            <Button
-              type="primary"
-              style={{ marginRight: '1rem'}}
-              onClick={() => selectedToken && onClaimReward()}
-              disabled={!unclaimedReward}
-            >
-              Claim
-            </Button>
-            <Button
-              type="primary"
-              onClick={() => selectedToken && onLevelUpgrade()}
-              disabled={!!unclaimedReward}
-            >
-              Upgrade
-            </Button>
-          </div>
-          <p className="unclaimed-reward-text">
-            Unclaimed reward: <span style={{ color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>{unclaimedReward}</span> {CONFIG.coinName}
-          </p>
-        </Modal>
+        />
       </Col>
     </>
   );
