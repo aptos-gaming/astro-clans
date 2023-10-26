@@ -99,7 +99,6 @@ export const TokensList = () => {
           ))}
         </div>
       )}
-      <div className='divider' />
     </Col>
   );
   

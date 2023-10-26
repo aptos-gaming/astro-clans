@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button } from 'antd'
+import { Button, Tabs } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
 import Tippy from '@tippyjs/react'
@@ -23,6 +23,8 @@ import { Unit } from '../types'
 import { client, provider } from '../aptosClient'
 import { airdropResources, mintPlanet } from '../onChainUtils'
 import CONFIG from '../config.json'
+
+const { TabPane } = Tabs;
 
 const Decimals = 8
 
@@ -275,7 +277,55 @@ const Player = () => {
     }
   }, [selectedContract])
 
-  console.log(tokenBalances)
+  const StakingUI = () => (
+    <>
+      <span className='white-text'>To gain more resources you can stake your Planet, reward depends on Planet level, so you can also upgrade Planet to increase resource income</span>
+      <TokensList />
+      <StakePlanetModal
+        unclaimedReward={unclaimedReward}
+        onClaimReward={onClaimReward}
+        onStakeToken={onStakeToken}
+        onUnstakeToken={onUnstakeToken}
+        onLevelUpgrade={onLevelUpgrade}
+        rewardCoinType={rewardCoinType}
+        onHide={() => {
+          setSelectedToken(null)
+          setUnclaimedReward(0)  
+        }}
+      />
+    </>
+  );
+
+  const SwapUI = () => (
+    <>
+      <h2 className='white-text'>You can swap your resources using Trading Post:</h2>
+      <SwapContainer
+        selectedPairData={selectedPairData}
+      />
+      <div className="divider" />
+    </>
+  );
+
+  const PvEUI = () => (
+    <>
+      <span className='white-text'>After you collect some resources, you can hire units to fight with pirates:</span>
+      <h2 className='white-text'>Units to Buy:</h2>
+      <ContractsList onSelectedContract={setSelectedContract} unitsList={unitsList} />
+      <BuyUnitsModal
+        maxUnits={maxUnits}
+        onBuyUnits={onBuyUnits}
+        onCancel={() => setSelectedContract(null)}
+        selectedContract={selectedContract}
+      />
+      <h2 className='white-text'>Enemies to Attack:</h2>
+      <EnemiesList setSelectedEnemy={setSelectedEnemy} />
+      <AttackEnemyModal
+        onCancel={() => setSelectedEnemy(null)}
+        unitsList={unitsList}
+        selectedEnemy={selectedEnemy}
+      />
+    </>
+  );
 
   return (
     <>
@@ -304,47 +354,17 @@ const Player = () => {
           </Tippy>
         ) : null}
       </div>
-      {/* Staking UI */}
-      <span className='white-text'>To gain more resources you can stake your Planet, reward depends on Planet level, so you can also upgrade Planet to increase resource income</span>
-      <TokensList />
-      <StakePlanetModal
-        unclaimedReward={unclaimedReward}
-        onClaimReward={onClaimReward}
-        onStakeToken={onStakeToken}
-        onUnstakeToken={onUnstakeToken}
-        onLevelUpgrade={onLevelUpgrade}
-        rewardCoinType={rewardCoinType}
-        onHide={() => {
-          setSelectedToken(null)
-          setUnclaimedReward(0)  
-        }}
-      />
-      {/* Swap UI */}
-      <h2 className='white-text'>You can swap your resources using Trading Post:</h2>
-      <SwapContainer
-        selectedPairData={selectedPairData}
-      />
-      <div className="divider" />
-      {/* PvE UI */}
-      <span className='white-text'>After you collect some resources, you can hire units to fight with pirates:</span>
-      {/* show UI to hire units and UnitsList*/}
-      <h2 className='white-text'>Units to Buy:</h2>
-      <ContractsList onSelectedContract={setSelectedContract} unitsList={unitsList} />
-      <BuyUnitsModal
-        maxUnits={maxUnits}
-        onBuyUnits={onBuyUnits}
-        onCancel={() => setSelectedContract(null)}
-        selectedContract={selectedContract}
-      />
-
-      <h2 className='white-text'>Enemies to Attack:</h2>
-      <EnemiesList setSelectedEnemy={setSelectedEnemy} />
-      <AttackEnemyModal
-        onCancel={() => setSelectedEnemy(null)}
-        unitsList={unitsList}
-        selectedEnemy={selectedEnemy}
-      />
-      
+      <Tabs defaultActiveKey="1">
+        <TabPane tab="Staking" key="1">
+          <StakingUI />
+        </TabPane>
+        <TabPane tab="Swap" key="2">
+          <SwapUI />
+        </TabPane>
+        <TabPane tab="PvE" key="3">
+          <PvEUI />
+        </TabPane>
+      </Tabs>
     </>
   )
 }
