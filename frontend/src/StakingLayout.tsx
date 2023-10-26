@@ -11,6 +11,7 @@ import CreateCollectioForm from './components/StakingForms/CreateCollectionForm'
 import { StakePlanetModal } from './components'
 import InitStakingForm from './components/StakingForms/InitStakingForm'
 import { client, provider } from './aptosClient'
+import { CoinBalancesQuery } from './components/CoinBalance';
 import CONFIG from "./config.json"
 
 const PackageName = "staking"
@@ -36,7 +37,6 @@ const StakingLayout = () => {
       }
     }
     init()
-    
   }, [account?.address])
 
   useEffect(() => {
@@ -154,6 +154,7 @@ const StakingLayout = () => {
       setUnclaimedReward(0)
       await client.waitForTransactionWithResult(tx.hash)
       await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
+      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
     } catch (e) {
       console.log("Error druing unstake token tx")
       console.log(e)
@@ -173,12 +174,12 @@ const StakingLayout = () => {
       setSelectedToken(null)
       setUnclaimedReward(0)
       await client.waitForTransactionWithResult(tx.hash)
+      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
     } catch (e) {
       console.log("Error druing claim reward tx")
       console.log(e)
     }
   }
-
 
   const getUnclaimedReward = async (token: any) => {
     const payload = {
@@ -213,7 +214,11 @@ const StakingLayout = () => {
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Upgrading planet level...',
+        success: 'Planet level upgraded',
+        error: 'Error during planet upgrade'
+      })
       setSelectedToken(null)
       setUnclaimedReward(0)
       await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
@@ -241,6 +246,7 @@ const StakingLayout = () => {
           onStakeToken={onStakeToken}
           onUnstakeToken={onUnstakeToken}
           onLevelUpgrade={onLevelUpgrade}
+          rewardCoinType={rewardCoinType}
           onHide={() => {
             setSelectedToken(null)
             setUnclaimedReward(0)  

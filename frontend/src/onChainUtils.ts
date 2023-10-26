@@ -8,7 +8,6 @@ import CONFIG from './config.json'
 
 const Decimals = 8
 
-
 async function swap (
   coinFromAmount: number,
   // @todo: add type here

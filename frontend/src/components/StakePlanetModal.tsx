@@ -10,10 +10,11 @@ interface StakePlanetModalProps {
   onClaimReward: () => Promise<void>;
   onLevelUpgrade: () => Promise<void>;
   onHide: () => void;
+  rewardCoinType: string;
 }
 
 const StakePlanetModal = ({
-  unclaimedReward, onHide, onStakeToken, onUnstakeToken, onClaimReward, onLevelUpgrade,
+  unclaimedReward, onHide, onStakeToken, onUnstakeToken, onClaimReward, onLevelUpgrade, rewardCoinType,
 }: StakePlanetModalProps) => {
   const { selectedToken } = useSelectedToken()
 
@@ -58,7 +59,7 @@ const StakePlanetModal = ({
         </Button>
       </div>
       <p className="unclaimed-reward-text">
-        Unclaimed reward: <span style={{ color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>{unclaimedReward}</span>
+        Unclaimed reward: <span style={{ color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>{unclaimedReward} {rewardCoinType ? rewardCoinType.split('::')[2] : ''}</span>
       </p>
     </Modal>
   )

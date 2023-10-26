@@ -160,6 +160,7 @@ const Player = () => {
       setSelectedToken(null)
       setUnclaimedReward(0)
       await client.waitForTransactionWithResult(tx.hash)
+      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
     } catch (e) {
       console.log("Error druing claim reward tx")
       console.log(e)
@@ -310,13 +311,14 @@ const Player = () => {
         onStakeToken={onStakeToken}
         onUnstakeToken={onUnstakeToken}
         onLevelUpgrade={onLevelUpgrade}
+        rewardCoinType={rewardCoinType}
         onHide={() => {
           setSelectedToken(null)
           setUnclaimedReward(0)  
         }}
       />
       {/* Swap UI */}
-      <h2 className='white-text'>You can swap your resources to another one using Trading Post:</h2>
+      <h2 className='white-text'>You can swap your resources using Trading Post:</h2>
       <SwapContainer
         selectedPairData={selectedPairData}
       />
