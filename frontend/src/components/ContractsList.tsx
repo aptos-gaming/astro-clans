@@ -31,7 +31,7 @@ const ContractsList = ({ onSelectedContract, unitsList }: ContractsListProps) =>
     const payload = {
       function: `${CONFIG.pveModule}::${PackageName}::get_all_unit_contracts`,
       type_arguments: [],
-      arguments: [account?.address]
+      arguments: [CONFIG.pveOwner]
     }
 
     try {

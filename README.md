@@ -1,24 +1,8 @@
 ### Local testing
 
-1. Follow the official [Aptos CLI installation guide](https://aptos.dev/tools/install-cli/)
-2. Create new aptos account with `aptos init` (will create new folder .aptos and store public and private key in it)
-3. Import private_key from .aptos to Petra Extension
-4. Go to `/mintCoins` folder and mint 10 coins using account (owner_addr) from `.aptos/config.yaml` 'account' field 
-    Run `aptos move publish --named-addresses owner_addr=account` in /move folder
-5. Go to `/coreMechanics` folder and create resource account and deploy swap module using same account value in `source_addr`
-    ```
-    aptos move create-resource-account-and-publish-package --seed 12345 --address-name owner_addr --profile default --named-addresses source_addr=account
-    ```
-    Copy resource account address after deployment.
+#### To build and deploy all `Move` modules:
+1. cd `/move/staking`,  run `aptos move publish --named-addresses owner_addr=YOUR_ADDRESS` 
+2. cd `/move/swap`, run `aptos move create-resource-account-and-publish-package --seed 12345 --address-name owner_addr --profile default --named-addresses source_addr=YOUR_ADDRESS`
+3. cd `/move/pve`, run `aptos move create-resource-account-and-publish-package --seed 56789 --address-name owner_addr --profile default --named-addresses source_addr=YOUR_ADDRESS`
 
 
-@todo:
-- create full game using staking, swaping and pve modules
-- make a short onboard tutorial about "How to play" in AstroClans
-
-
-
-1. Build and deploy all `Move` modules
-2. cd `/move/staking`,  run `aptos move publish --named-addresses owner_addr=` 
-3. cd `/move/swap`, run `aptos move create-resource-account-and-publish-package --seed 12345 --address-name owner_addr --profile default --named-addresses source_addr=de80f21e320cb6ee6ec1e775505563897d742611bd79218059985b452959527f`
-4. cd `/move/pve`, run `aptos move create-resource-account-and-publish-package --seed 56789 --address-name owner_addr --profile default --named-addresses source_addr=de80f21e320cb6ee6ec1e775505563897d742611bd79218059985b452959527f`

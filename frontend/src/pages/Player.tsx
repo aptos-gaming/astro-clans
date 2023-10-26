@@ -48,7 +48,7 @@ const Player = () => {
     const payload = {
       function: `${CONFIG.pveModule}::${packageName}::get_all_units`,
       type_arguments: [],
-      arguments: [account?.address]
+      arguments: [CONFIG.pveOwner]
     }
 
     try {
@@ -139,6 +139,7 @@ const Player = () => {
       setUnclaimedReward(0)
       await client.waitForTransactionWithResult(tx.hash)
       await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
+      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
     } catch (e) {
       console.log("Error druing unstake token tx")
       console.log(e)
@@ -274,12 +275,13 @@ const Player = () => {
     }
   }, [selectedContract])
 
+  console.log(tokenBalances)
 
   return (
     <>
       <div style={{ marginBottom: '16px' }}>
         {/* allow mint token only if user hasnt any tokens or has less than 2 */}
-        {(tokenBalances && tokenBalances.length < 2) || tokenBalances.length === 0 ? (
+        {(tokenBalances && tokenBalances.length < 1) || tokenBalances.length === 0 ? (
           <Tippy content="Mint a planet with random level property">
             <Button
               onClick={() => mintPlanet(ownerAddress, signAndSubmitTransaction, apolloClient)}
@@ -290,8 +292,8 @@ const Player = () => {
           </Tippy>
         ) : null}
         {/* allow airdrop only if user hasnt any coins or has less then 1000 Minerals */}
-        {(coinBalances.length > 0 && coinBalances.find((coinBalance) => coinBalance.coin_info.name === 'Minerals' &&  coinBalance.amount < 1000 * 10 ** Decimals)) || coinBalances.length === 0 ? (
-          <Tippy content="Airdrop 10 000 Minerals and 10 000 Energy Crystals">
+        {(coinBalances.find((coinBalance) => coinBalance.coin_info.name === 'Gasolineium' &&  coinBalance.amount < 10 * 10 ** Decimals)) || coinBalances.length === 0 ? (
+          <Tippy content="Airdrop 10 Gasolineium and 10 Hypersteel">
             <Button
               onClick={() => airdropResources(signAndSubmitTransaction, apolloClient)}
               style={{ marginLeft: '8px' }}

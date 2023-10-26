@@ -17,14 +17,10 @@ import {
 import { Enemy, Unit, Contract } from './types'
 import useCoinBalances from './context/useCoinBalances'
 import { CoinBalancesQuery } from './components/CoinBalance'
-import { attackEnemy } from './onChainUtils'
 import { client, provider } from './aptosClient'
 import CONFIG from "./config.json"
 
-
 const Decimals = 8
-const PackageName = "pve_battles"
-
 
 const PvELayout = () => {
   const { coinBalances } = useCoinBalances()
@@ -43,14 +39,15 @@ const PvELayout = () => {
 
   const getUnitsList = async () => {
     const payload = {
-      function: `${CONFIG.pveModule}::${PackageName}::get_all_units`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::get_all_units`,
       type_arguments: [],
-      arguments: [account?.address]
+      arguments: [CONFIG.pveOwner]
     }
 
     try {
       const allUnitsResponse: any = await provider.view(payload)
       setUnitsList(allUnitsResponse[0].data)
+      console.log("All Units: ", allUnitsResponse)
     } catch(e) {
       console.log("ERROR during getting units list")
       console.log(e)
@@ -59,9 +56,9 @@ const PvELayout = () => {
 
   const getContractsList = async () => {
     const payload = {
-      function: `${CONFIG.pveModule}::${PackageName}::get_all_unit_contracts`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::get_all_unit_contracts`,
       type_arguments: [],
-      arguments: [account?.address]
+      arguments: [CONFIG.pveOwner]
     }
 
     try {
@@ -75,9 +72,9 @@ const PvELayout = () => {
 
   const getEnemysList = async () => {
     const payload = {
-      function: `${CONFIG.pveModule}::${PackageName}::get_all_enemy_levels`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::get_all_enemy_levels`,
       type_arguments: [],
-      arguments: [account?.address]
+      arguments: [CONFIG.pveOwner]
     }
 
     try {
@@ -92,7 +89,7 @@ const PvELayout = () => {
   const onMintCoins = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${PackageName}::mint_coins`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::mint_coins`,
       type_arguments: [],
       arguments: []
     }
@@ -109,7 +106,7 @@ const PvELayout = () => {
   const onRemoveContract = async (contractId: string) => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${PackageName}::remove_unit_contract`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::remove_unit_contract`,
       type_arguments: [],
       // contract_id: u64
       arguments: [contractId]
@@ -127,7 +124,7 @@ const PvELayout = () => {
   const onRemoveEnemyLevel = async (levelId: string) => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${PackageName}::remove_enemy_level`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::remove_enemy_level`,
       type_arguments: [],
       // enemy_level_id: u64
       arguments: [levelId]
@@ -145,7 +142,7 @@ const PvELayout = () => {
   const onBuyUnits = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${PackageName}::buy_units`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::buy_units`,
       // <CoinType, UnitType>
       type_arguments: [selectedContract?.coinType, selectedContract.unitType],
       // contract_id: u64, coins_amount: u64, number_of_units: u64

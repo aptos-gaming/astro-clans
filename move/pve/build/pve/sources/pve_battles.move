@@ -16,7 +16,7 @@ module owner_addr::pve_battles {
   use aptos_framework::event::{ Self, EventHandle };
 
   use owner_addr::deploy_coin::deploy_coin;
-  use owner_addr::mint_coins::{ Minerals, EnergyCrystals };
+  use owner_addr::mint_coins::{ Hypersteel, Gasolineium };
 
   struct UnitCoin<phantom X> has store {}
 
@@ -46,6 +46,7 @@ module owner_addr::pve_battles {
     name: String,
     attack: u64,
     health: u64,
+    image_url: String,
     reward_coin_types: vector<String>,
     reward_coin_amounts: vector<u64>,
   }
@@ -177,17 +178,20 @@ module owner_addr::pve_battles {
 
   // create new unit (coin) and push to Units map
   public entry fun create_unit<CoinType>(
-    creator: &signer, name: String, description: String, image_url: String, attack: u64, health: u64,
+    creator: &signer, name: String, symbol: String, description: String, image_url: String, attack: u64, health: u64,
   ) acquires Units, AdminData {
     let unit_name_in_bytes = bcs::to_bytes(&name);
     vector::remove(&mut unit_name_in_bytes, 0);
+
+    let unit_symbol_in_bytes = bcs::to_bytes(&symbol);
+    vector::remove(&mut unit_symbol_in_bytes, 0);
 
     let resource_signer = get_resource_signer();
 
     managed_coin::initialize<UnitCoin<CoinType>>(
       &resource_signer,
       unit_name_in_bytes,
-      unit_name_in_bytes,
+      unit_symbol_in_bytes,
       8,
       true,
     );
@@ -285,7 +289,7 @@ module owner_addr::pve_battles {
 
   // add new enemy level
   public entry fun create_enemy_level<CoinType>(
-    creator: &signer, name: String, attack: u64, health: u64, reward_coin_amount: u64,
+    creator: &signer, name: String, attack: u64, health: u64, image_url: String, reward_coin_amount: u64,
   ) acquires EnemyLevels {
     let creator_addr = signer::address_of(creator);
 
@@ -308,11 +312,12 @@ module owner_addr::pve_battles {
       health,
       reward_coin_types,
       reward_coin_amounts,
+      image_url,
     });
   }
 
   public entry fun create_enemy_level_with_two_reward_coins<CoinType1, CoinType2>(
-    creator: &signer, name: String, attack: u64, health: u64, reward_coin_1_amount: u64, reward_coin_2_amount: u64,
+    creator: &signer, name: String, attack: u64, health: u64, image_url: String, reward_coin_1_amount: u64, reward_coin_2_amount: u64,
   ) acquires EnemyLevels {
     let creator_addr = signer::address_of(creator);
 
@@ -339,6 +344,7 @@ module owner_addr::pve_battles {
       health,
       reward_coin_types,
       reward_coin_amounts,
+      image_url,
     });
   }
 
@@ -686,17 +692,32 @@ module owner_addr::pve_battles {
     );
   }
 
-  // used for airdrop new users
-  public entry fun mint_coins(user: &signer) acquires AdminData {
+  // used for admin airdrop
+  public entry fun mint_admin_coins(user: &signer) acquires AdminData {
     let user_addr = signer::address_of(user);
     
-    managed_coin::register<Minerals>(user);
-    managed_coin::register<EnergyCrystals>(user);
+    assert!(user_addr == @source_addr, E_INVALID_ACCESS_RIGHTS);
+
+    managed_coin::register<Hypersteel>(user);
+    managed_coin::register<Gasolineium>(user);
 
     let resource_signer = get_resource_signer();
     
-    managed_coin::mint<Minerals>(&resource_signer, user_addr, 1000000000000);
-    managed_coin::mint<EnergyCrystals>(&resource_signer, user_addr, 1000000000000);
+    managed_coin::mint<Hypersteel>(&resource_signer, user_addr, 1000000000000);
+    managed_coin::mint<Gasolineium>(&resource_signer, user_addr, 1000000000000);
+  }
+
+  // used for airdrop new users
+  public entry fun mint_airdrop_coins(user: &signer) acquires AdminData {
+    let user_addr = signer::address_of(user);
+    
+    managed_coin::register<Hypersteel>(user);
+    managed_coin::register<Gasolineium>(user);
+
+    let resource_signer = get_resource_signer();
+    
+    managed_coin::mint<Hypersteel>(&resource_signer, user_addr, 1000000000);
+    managed_coin::mint<Gasolineium>(&resource_signer, user_addr, 1000000000);
   }
 
   // return all units created by address

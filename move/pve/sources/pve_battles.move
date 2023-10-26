@@ -16,7 +16,7 @@ module owner_addr::pve_battles {
   use aptos_framework::event::{ Self, EventHandle };
 
   use owner_addr::deploy_coin::deploy_coin;
-  use owner_addr::mint_coins::{ Minerals, EnergyCrystals };
+  use owner_addr::mint_coins::{ Hypersteel, Gasolineium };
 
   struct UnitCoin<phantom X> has store {}
 
@@ -692,17 +692,32 @@ module owner_addr::pve_battles {
     );
   }
 
-  // used for airdrop new users
-  public entry fun mint_coins(user: &signer) acquires AdminData {
+  // used for admin airdrop
+  public entry fun mint_admin_coins(user: &signer) acquires AdminData {
     let user_addr = signer::address_of(user);
     
-    managed_coin::register<Minerals>(user);
-    managed_coin::register<EnergyCrystals>(user);
+    assert!(user_addr == @source_addr, E_INVALID_ACCESS_RIGHTS);
+
+    managed_coin::register<Hypersteel>(user);
+    managed_coin::register<Gasolineium>(user);
 
     let resource_signer = get_resource_signer();
     
-    managed_coin::mint<Minerals>(&resource_signer, user_addr, 1000000000000);
-    managed_coin::mint<EnergyCrystals>(&resource_signer, user_addr, 1000000000000);
+    managed_coin::mint<Hypersteel>(&resource_signer, user_addr, 1000000000000);
+    managed_coin::mint<Gasolineium>(&resource_signer, user_addr, 1000000000000);
+  }
+
+  // used for airdrop new users
+  public entry fun mint_airdrop_coins(user: &signer) acquires AdminData {
+    let user_addr = signer::address_of(user);
+    
+    managed_coin::register<Hypersteel>(user);
+    managed_coin::register<Gasolineium>(user);
+
+    let resource_signer = get_resource_signer();
+    
+    managed_coin::mint<Hypersteel>(&resource_signer, user_addr, 1000000000);
+    managed_coin::mint<Gasolineium>(&resource_signer, user_addr, 1000000000);
   }
 
   // return all units created by address

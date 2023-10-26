@@ -26,10 +26,9 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
 
   const getEnemysList = async () => {
     const payload = {
-      function: `${CONFIG.pveModule}::${PackageName}::get_all_enemy_levels`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::get_all_enemy_levels`,
       type_arguments: [],
-      // @todo: change to valid address after final deploy
-      arguments: [account?.address]
+      arguments: [CONFIG.pveOwner]
     }
 
     try {

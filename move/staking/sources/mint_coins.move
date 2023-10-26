@@ -18,14 +18,6 @@ module owner_addr::mint_coins {
   struct BioluminescentFiber {}
 
   fun init_module(owner: &signer) {
-    managed_coin::initialize<Gasolineium>(
-      owner,
-      b"Gasolineium",
-      b"GSM",
-      8,
-      true,
-    );
-
     managed_coin::initialize<OrganicBiomass>(
       owner,
       b"Organic Biomass",
@@ -65,13 +57,7 @@ module owner_addr::mint_coins {
       8,
       true,
     );
-    managed_coin::initialize<Hypersteel>(
-      owner,
-      b"Hypersteel",
-      b"HYSL",
-      8,
-      true,
-    );
+    
     managed_coin::initialize<BioluminescentFiber>(
       owner,
       b"Bioluminescent Fiber",
@@ -80,24 +66,20 @@ module owner_addr::mint_coins {
       true,
     );
 
-    managed_coin::register<Gasolineium>(owner);
     managed_coin::register<OrganicBiomass>(owner);
     managed_coin::register<PlasmaCores>(owner);
     managed_coin::register<NeutroniumAlloy>(owner);
     managed_coin::register<DarkMatterResidue>(owner);
     managed_coin::register<RefinedPlasmoid>(owner);
-    managed_coin::register<Hypersteel>(owner);
     managed_coin::register<BioluminescentFiber>(owner);
 
     let owner_addr = signer::address_of(owner);
 
-    managed_coin::mint<Gasolineium>(owner, owner_addr, 10000000000000);
     managed_coin::mint<OrganicBiomass>(owner, owner_addr, 10000000000000);
     managed_coin::mint<PlasmaCores>(owner, owner_addr, 10000000000000);
     managed_coin::mint<NeutroniumAlloy>(owner, owner_addr, 10000000000000);
     managed_coin::mint<DarkMatterResidue>(owner, owner_addr, 10000000000000);
     managed_coin::mint<RefinedPlasmoid>(owner, owner_addr, 10000000000000);
-    managed_coin::mint<Hypersteel>(owner, owner_addr, 10000000000000);
     managed_coin::mint<BioluminescentFiber>(owner, owner_addr, 10000000000000);
   }
 }

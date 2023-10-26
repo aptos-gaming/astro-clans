@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Col } from "antd";
+import { Col, Button } from "antd";
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { useApolloClient } from '@apollo/client'
 import { toast } from 'react-toastify'
@@ -12,6 +12,7 @@ import { StakePlanetModal } from './components'
 import InitStakingForm from './components/StakingForms/InitStakingForm'
 import { client, provider } from './aptosClient'
 import { CoinBalancesQuery } from './components/CoinBalance';
+import { airdropResources } from './onChainUtils';
 import CONFIG from "./config.json"
 
 const PackageName = "staking"
@@ -230,6 +231,13 @@ const StakingLayout = () => {
   return (
     <>  
       <Col>
+        <Button
+            onClick={() => airdropResources(signAndSubmitTransaction, apolloClient, 'admin')}
+            style={{ marginLeft: '8px' }}
+            type='primary'
+          >
+            Airdrop Resources
+          </Button>
         <h3 className='admin-section'>Token Staking</h3>
         <CreateCollectioForm
           createCollectionWithRewards={createCollectionWithRewards}

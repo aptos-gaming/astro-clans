@@ -133,10 +133,11 @@ const airdropResources = async (
   signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
   // @todo: add type here
   apolloClient: any,
+  userType?: string,
 ) => {
   const payload = {
     type: "entry_function_payload",
-    function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::mint_coins`,
+    function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::${userType === 'admin' ? 'mint_admin_coins' : 'mint_airdrop_coins'}`,
     type_arguments: [],
     arguments: []
   }
