@@ -1,24 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Input, Col, Modal, Form } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
-import { AptosClient, Provider, Network } from 'aptos'
 import { useApolloClient } from '@apollo/client'
 import { toast } from 'react-toastify'
 
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { AllPairsTable, CreatePairForm } from './components'
 import { formatCoinName, multipleWithDecimal } from './components/DexForms/CreatePairForm'
-import CONFIG from "./config.json"
-import { swap } from './onChainUtils'
 import SwapContainer from './components/SwapContainer'
+import { client, provider } from './aptosClient'
+import CONFIG from './config.json'
 
 const PackageName = "swap_coins"
-
-const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
-const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
-
-const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
-const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET)
 
 const Decimals = 8
 

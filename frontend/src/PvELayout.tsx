@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from 'antd'
-import { Provider, Network } from 'aptos'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
-import { AptosClient } from 'aptos'
 import Decimal from 'decimal.js'
 import { useApolloClient } from '@apollo/client'
 
@@ -20,13 +18,9 @@ import { Enemy, Unit, Contract } from './types'
 import useCoinBalances from './context/useCoinBalances'
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { attackEnemy } from './onChainUtils'
+import { client, provider } from './aptosClient'
 import CONFIG from "./config.json"
 
-const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
-const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
-
-const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
-const provider = new Provider(CONFIG.network === "devnet" ? Network.DEVNET : Network.TESTNET)
 
 const Decimals = 8
 const PackageName = "pve_battles"

@@ -17,7 +17,6 @@ const UnitRow = ({ unitData }: any) => (
   <div className="unit-row">
     <img width="200px" height="200px" src={unitData.image_url} alt="unit" />
     <p>{unitData.name}</p>
-    <p>{unitData.description}</p>
     <p>Heath (❤️): {unitData.health}</p>
     <p>Attack (⚔️): {unitData.attack}</p>
   </div>

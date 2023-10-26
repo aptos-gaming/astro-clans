@@ -312,3 +312,12 @@ input::-webkit-inner-spin-button {
 .buy-units-buttons, .black-text {
   color: black !important;
 }
+
+.units-list {
+  display: flex;
+  flex-direction: row;
+}
+
+.units-list .unit-row {
+  margin: 10px;
+}

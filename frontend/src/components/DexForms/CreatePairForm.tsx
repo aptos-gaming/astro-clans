@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from "react"
 import { Form, Input, Button, Select } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
-import { AptosClient } from "aptos"
 import { useApolloClient } from "@apollo/client"
 import Decimal from "decimal.js"
 
 import { CoinBalancesQuery } from '../CoinBalance'
 import useCoinBalances from "../../context/useCoinBalances"
-import CONFIG from "../../config.json"
+import { client } from '../../aptosClient'
 import { CoinBalance } from "../../context/CoinBalancesProvider"
+import CONFIG from "../../config.json"
 
 const { Option } = Select;
 
 const PackageName = "swap_coins"
 
-const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
-const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
-const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
 
 const Decimals = 8
 

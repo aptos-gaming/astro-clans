@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from 'antd'
-import { toast } from 'react-toastify'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
-import { Provider, Network, AptosClient } from 'aptos'
 import Tippy from '@tippyjs/react'
 import Decimal from 'decimal.js'
 
@@ -22,14 +20,9 @@ import {
 } from '../components'
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
 import { Unit } from '../types'
-import CONFIG from '../config.json'
+import { client, provider } from '../aptosClient'
 import { airdropResources, mintPlanet } from '../onChainUtils'
-
-const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
-const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
-
-const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
-const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET);
+import CONFIG from '../config.json'
 
 const Decimals = 8
 

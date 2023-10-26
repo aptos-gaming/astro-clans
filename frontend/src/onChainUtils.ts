@@ -1,17 +1,13 @@
 import { toast } from 'react-toastify'
-import { AptosClient } from 'aptos'
 
 import { formatCoinName, multipleWithDecimal } from './components/DexForms/CreatePairForm'
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { AccountTokensV2WithDataQuery } from './components/TokensList'
+import { client } from './aptosClient'
 import CONFIG from './config.json'
 
 const Decimals = 8
 
-const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
-const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
-
-const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
 
 async function swap (
   coinFromAmount: number,

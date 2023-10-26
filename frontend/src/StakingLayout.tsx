@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Col } from "antd";
-import { Network, Provider, AptosClient } from "aptos"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { useApolloClient } from '@apollo/client'
 import { toast } from 'react-toastify'
@@ -11,15 +10,10 @@ import useCollectionOwner from './context/useCollectionOwner'
 import CreateCollectioForm from './components/StakingForms/CreateCollectionForm'
 import { StakePlanetModal } from './components'
 import InitStakingForm from './components/StakingForms/InitStakingForm'
+import { client, provider } from './aptosClient'
 import CONFIG from "./config.json"
 
 const PackageName = "staking"
-
-const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
-const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
-
-const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
-const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET);
 
 const Decimals = 8
 
