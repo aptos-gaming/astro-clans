@@ -52,11 +52,11 @@ const router = createBrowserRouter([
   {
     path: "/play",
     element: (
-      <>
+      <div className='player-page-wrapper'>
         <WalletConnect />
         <CoinBalance />
         <Player />
-      </>
+      </div>
     ),
   }
 ]);

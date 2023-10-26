@@ -20,6 +20,11 @@ body {
   margin-top: 16px;
 }
 
+.player-page-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
 label, h3, p {
   color: white !important;
 }

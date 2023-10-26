@@ -64,7 +64,7 @@ const CoinBalance = () => {
 
   return (
     <Col className="balances-container">
-      {data?.current_coin_balances && data?.current_coin_balances?.length && data?.current_coin_balances?.map((coinData: BalanceContainerProps) => <BalanceContainer coinData={coinData} />)} 
+      {data?.current_coin_balances && data?.current_coin_balances?.length > 0 && data?.current_coin_balances?.map((coinData: BalanceContainerProps) => <BalanceContainer coinData={coinData} />)} 
     </Col>
   )
 }

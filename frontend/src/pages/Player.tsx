@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Tabs } from 'antd'
+import { Alert, Button, Tabs } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
 import Tippy from '@tippyjs/react'
@@ -279,7 +279,12 @@ const Player = () => {
 
   const StakingUI = () => (
     <>
-      <span className='white-text'>To gain more resources you can stake your Planet, reward depends on Planet level, so you can also upgrade Planet to increase resource income</span>
+      <Alert 
+        type="info"
+        message="Resource extraction"
+        description="Start extracting minerals from your planets. The yield is determined by the planet's level. By upgrading your planets, you can boost the resource income."
+        showIcon
+      />
       <TokensList />
       <StakePlanetModal
         unclaimedReward={unclaimedReward}
@@ -328,7 +333,7 @@ const Player = () => {
   );
 
   return (
-    <>
+    <div className='player-page-wrapper'>
       <div style={{ marginBottom: '16px' }}>
         {/* allow mint token only if user hasnt any tokens or has less than 2 */}
         {(tokenBalances && tokenBalances.length < 1) || tokenBalances.length === 0 ? (
@@ -365,7 +370,7 @@ const Player = () => {
           <PvEUI />
         </TabPane>
       </Tabs>
-    </>
+    </div>
   )
 }
 
