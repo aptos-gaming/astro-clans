@@ -239,7 +239,7 @@ const StakingLayout = () => {
         <div className="divider" />
         <InitStakingForm
           createStaking={createStaking}
-          isDisabled={!account?.address || !rewardCoinType}
+          isDisabled={!account?.address}
         />
         <StakePlanetModal
           unclaimedReward={unclaimedReward}

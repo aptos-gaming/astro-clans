@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { Input, Row, Button, Col, Modal, Form, Switch } from 'antd'
+import { Input, Col, Modal, Form } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
-import { WalletSelector } from '@aptos-labs/wallet-adapter-ant-design'
 import { AptosClient, Provider, Network } from 'aptos'
 import { useApolloClient } from '@apollo/client'
-import Decimal from 'decimal.js'
 import { toast } from 'react-toastify'
 
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { AllPairsTable, CreatePairForm } from './components'
 import { formatCoinName, multipleWithDecimal } from './components/DexForms/CreatePairForm'
 import CONFIG from "./config.json"
+import { swap } from './onChainUtils'
+import SwapContainer from './components/SwapContainer'
 
 const PackageName = "swap_coins"
 
@@ -18,7 +18,7 @@ const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
 const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
 
 const client = new AptosClient(CONFIG.network === "devnet" ? DevnetClientUrl : TestnetClientUrl)
-const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET);
+const provider = new Provider(CONFIG.network === "devnet" ?  Network.DEVNET : Network.TESTNET)
 
 const Decimals = 8
 
@@ -26,20 +26,7 @@ const DexLayoyt = () => {
   const { account, signAndSubmitTransaction } = useWallet()
   const apolloClient = useApolloClient()
 
-  // Toggle admin panel
-  const [showBlock, setShowBlock] = useState(false);
-  const toggleBlock = (checked: boolean) => {
-    setShowBlock(checked);
-  };
-
-  const [coinFromAmount, setCoinFromAmount] = useState<string>("0")
-  const [coinToAmount1, setCoinToAmount1] = useState<string>("0")
-  const [coinToAmount2, setCoinToAmount2] = useState<number>(0)
-
-
-  // events
-  const [selectedPairData, onSelectedPairData] = useState<any>(null)
-
+  const [selectedPairData, setSelectedPairData] = useState<any>(null)
   const [tradingPairs, setTradingPairs] = useState([])
   const [isIncreaseReservesVisible, setIsIncreaseReservesVisible] = useState(false)
 
@@ -77,54 +64,6 @@ const DexLayoyt = () => {
       })
       await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
       getAllTradingPairs()
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-
-  const onSwap = async () => {
-    if (!selectedPairData) {
-      alert("Select one of the pairs please")
-      return
-    }
-
-    let pairType = "swap"
-    const typeArguments: Array<string> = [selectedPairData.value.coins_from_name[0]]
-    const args: Array<String | number> = [selectedPairData.key, multipleWithDecimal(10 ** Decimals, coinFromAmount)]
-
-    
-    if (selectedPairData.value.coins_from_name.length === 2 && selectedPairData.value.coins_to_name.length === 1) {
-      pairType = "triple_swap"
-      args.push(multipleWithDecimal(10 ** Decimals, coinFromAmount))
-      typeArguments.push(selectedPairData.value.coins_from_name[1], selectedPairData.value.coins_to_name[0])
-    } else if (selectedPairData.value.coins_from_name.length === 2 && selectedPairData.value.coins_to_name.length === 2) {
-      pairType = "quadruple_swap"
-      args.push(multipleWithDecimal(10 ** Decimals, coinFromAmount))
-      typeArguments.push(selectedPairData.value.coins_from_name[1], selectedPairData.value.coins_to_name[0], selectedPairData.value.coins_to_name[1])
-    } else {
-      typeArguments.push(selectedPairData.value.coins_to_name[0])
-    }
-
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.swapModule}::${PackageName}::${pairType}`,
-      type_arguments: typeArguments,
-      //            basic swap   triple or quadruple          
-      // pair_id, coin_amount_a / coin_amount_b
-      arguments: args,
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      toast.promise(client.waitForTransactionWithResult(tx.hash), {
-        pending: 'Swapping...',
-        success: 'Succesfully swapped',
-        error: 'Error during swap'
-      })
-      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
-      setCoinFromAmount("0")
-      setCoinToAmount1("0")
-      setCoinToAmount2(0)
     } catch (e) {
       console.log(e)
     }
@@ -207,147 +146,69 @@ const DexLayoyt = () => {
     }
   }, [account?.address])
 
-  useEffect(() => {
-    if (coinFromAmount && selectedPairData) {
-      setCoinToAmount1(Number(multipleWithDecimal(selectedPairData.value.exchange_rates[0], Number(coinFromAmount))) / 100 as any)
-      if (selectedPairData.value.exchange_rates[1]) {
-        setCoinToAmount2(Number(multipleWithDecimal(selectedPairData.value.exchange_rates[1], Number(coinFromAmount))) / 100)
-      }
-    }
-  }, [coinFromAmount, selectedPairData])
-
-  useEffect(() => {
-    setCoinFromAmount("0")
-    setCoinToAmount1("0")
-    setCoinToAmount2(0)
-  }, [selectedPairData])
 
   return (
     <>
-      <Row>
-        <div className="dex">
-          <h2>Trading post</h2>
-          <div className="swaps-container">
-            {/* Swap from Coins */}
-            <div className="swap-from">
-              <div className="first-coin">
-                {selectedPairData && <p className='coin-name'>{formatCoinName(selectedPairData.value.coins_from_name[0])}</p>}
+      <SwapContainer selectedPairData={selectedPairData} />
+      <div>
+        <Col>
+          <AllPairsTable
+            data={tradingPairs}
+            onRemovePair={onRemovePair}
+            onSelectedPairData={setSelectedPairData}
+            openReservesModal={() => setIsIncreaseReservesVisible(true)}
+          />
+        </Col>
+        <Col>
+          <CreatePairForm getAllTradingPairs={getAllTradingPairs} />
+        </Col>
+        <Modal
+          title="Increase reserves"
+          open={isIncreaseReservesVisible && selectedPairData}
+          onCancel={() => setIsIncreaseReservesVisible(false)}
+          onOk={onIncreaseReserves}
+          okText="Increase"
+        >
+          <Form className="increase-reserves-form">
+            <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_from_name[0])}`}>
+              <Input
+                type="number"
+                value={coinAAmountReserve}
+                onChange={(e) => setCoinAAmountReserve(Number(e.target.value))}
+                placeholder="Amount of coins From moved to reserve"
+              />
+            </Form.Item>
+            <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_to_name[0])}`}>
+              <Input
+                type="number"
+                value={coinCAmountReserve}
+                onChange={(e) => setCoinCAmountReserve(Number(e.target.value))}
+                placeholder="Amount of coins From moved to reserve"
+              />
+            </Form.Item>
+            {selectedPairData && selectedPairData?.value?.coins_from_name.length === 2 && (
+              <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_from_name[1])}`}>
                 <Input
                   type="number"
-                  value={coinFromAmount}
-                  onChange={(e) => {
-                    if (!e.target.value) {
-                      return setCoinFromAmount('')
-                    }
-                    setCoinFromAmount(new Decimal(e.target.value).toString())
-                  }}
+                  value={coinBAmountReserve}
+                  onChange={(e) => setCoinBAmountReserve(Number(e.target.value))}
+                  placeholder="Amount of coins From moved to reserve"
                 />
-              </div>
-              {selectedPairData && selectedPairData?.value?.coins_from_name.length === 2 && (
-                <div className="second-coin">
-                  <p className='coin-name'>{formatCoinName(selectedPairData.value.coins_from_name[1])}</p>
-                  <Input
-                    type="number"
-                    value={coinFromAmount}
-                    onChange={(e) => {
-                      setCoinFromAmount(new Decimal(e.target.value).toString())
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-            <div className="arrow-right-container">
-              <img src="../icons/right-arrow.png" alt="arrow-right" />
-            </div>
-            {/* Swap to Coins*/}
-            <div className="swap-to">
-              <div className="first-coin">
-                {selectedPairData && <p className='coin-name'>{formatCoinName(selectedPairData.value.coins_to_name[0])}</p>}
-                <Input type="number" value={coinToAmount1} />
-              </div>
-              {selectedPairData && selectedPairData?.value?.coins_from_name.length === 2 && selectedPairData?.value?.coins_to_name.length === 2 && (
-                <div className="second-coin">
-                  <p className='coin-name'>{formatCoinName(selectedPairData.value.coins_to_name[1])}</p>
-                  <Input value={coinToAmount2} type="number" />
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="swap-button">
-            {account?.address ? (
-              <Button
-                style={{ height: '2.5rem'}}
-                onClick={onSwap}
-                block
-                type="primary"
-              >
-                Swap
-              </Button>
-            ) : (
-              <WalletSelector />
+              </Form.Item>
             )}
-          </div>
-        </div>
-      </Row>
-        <div>
-          <Col>
-            <AllPairsTable
-              data={tradingPairs}
-              onRemovePair={onRemovePair}
-              onSelectedPairData={onSelectedPairData}
-              openReservesModal={() => setIsIncreaseReservesVisible(true)}
-            />
-          </Col>
-          <Col>
-            <CreatePairForm getAllTradingPairs={getAllTradingPairs} />
-          </Col>
-          <Modal
-            title="Increase reserves"
-            open={isIncreaseReservesVisible && selectedPairData}
-            onCancel={() => setIsIncreaseReservesVisible(false)}
-            onOk={onIncreaseReserves}
-            okText="Increase"
-          >
-            <Form className="increase-reserves-form">
-              <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_from_name[0])}`}>
+            {selectedPairData && selectedPairData?.value?.coins_from_name.length === 2 && selectedPairData?.value?.coins_to_name.length === 2 && (
+              <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_to_name[1])}`}>
                 <Input
                   type="number"
-                  value={coinAAmountReserve}
-                  onChange={(e) => setCoinAAmountReserve(Number(e.target.value))}
+                  value={coinDAmountReserve}
+                  onChange={(e) => setCoinDAmountReserve(Number(e.target.value))}
                   placeholder="Amount of coins From moved to reserve"
                 />
               </Form.Item>
-              <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_to_name[0])}`}>
-                <Input
-                  type="number"
-                  value={coinCAmountReserve}
-                  onChange={(e) => setCoinCAmountReserve(Number(e.target.value))}
-                  placeholder="Amount of coins From moved to reserve"
-                />
-              </Form.Item>
-              {selectedPairData && selectedPairData?.value?.coins_from_name.length === 2 && (
-                <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_from_name[1])}`}>
-                  <Input
-                    type="number"
-                    value={coinBAmountReserve}
-                    onChange={(e) => setCoinBAmountReserve(Number(e.target.value))}
-                    placeholder="Amount of coins From moved to reserve"
-                  />
-                </Form.Item>
-              )}
-              {selectedPairData && selectedPairData?.value?.coins_from_name.length === 2 && selectedPairData?.value?.coins_to_name.length === 2 && (
-                <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_to_name[1])}`}>
-                  <Input
-                    type="number"
-                    value={coinDAmountReserve}
-                    onChange={(e) => setCoinDAmountReserve(Number(e.target.value))}
-                    placeholder="Amount of coins From moved to reserve"
-                  />
-                </Form.Item>
-              )}
-            </Form>
-          </Modal>
-        </div>
+            )}
+          </Form>
+        </Modal>
+      </div>
     </>
   )
 }

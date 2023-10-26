@@ -18,10 +18,12 @@ import {
   BuyUnitsModal,
   ContractsList,
   StakePlanetModal,
+  SwapContainer,
 } from '../components'
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
 import { Unit } from '../types'
 import CONFIG from '../config.json'
+import { airdropResources, mintPlanet } from '../onChainUtils'
 
 const DevnetClientUrl = "https://fullnode.devnet.aptoslabs.com/v1"
 const TestnetClientUrl = "https://fullnode.testnet.aptoslabs.com"
@@ -46,34 +48,7 @@ const Player = () => {
   const [maxUnits, setMaxUnits] = useState(0)
   const [unclaimedReward, setUnclaimedReward] = useState(0)
   const [rewardCoinType, setRewardCoinType] = useState('')
-
-  const onMintPlanet = async () => {
-    const packageName = "staking"
-  
-    if (!account) return
-    if (!ownerAddress) {
-      toast.error('No owner address')
-      return
-    }
-
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${packageName}::mint_token`,
-      type_arguments: [],
-      arguments: [ownerAddress],
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      toast.promise(client.waitForTransactionWithResult(tx.hash), {
-        pending: 'Minting new token...',
-        success: 'Token minted',
-        error: 'Error during token mint'
-      })
-      await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
-    } catch (e) {
-      console.log(e)
-    }
-  }
+  const [selectedPairData, setSelectedPairData] = useState<any>(null)
 
   const getUnitsList = async () => {
     const packageName = "pve_battles"
@@ -88,72 +63,6 @@ const Player = () => {
       setUnitsList(allUnitsResponse[0].data)
     } catch(e) {
       console.log("ERROR during getting units list")
-      console.log(e)
-    }
-  }
-
-  const onAttackEnemy = async (unitsForAttack: any) => {
-    const packageName = "pve_battles"
-    const unitType1 = String(Object.values(unitsForAttack)[0])?.split("-")[1]
-    const unitId1 = Object.keys(unitsForAttack)[0]
-    const numberOfUnits1ForAttack = unitsForAttack[unitId1].split("-")[0]
-
-    if (!unitType1 || !unitId1 || !selectedEnemy) return
-
-    let numberOfUnitTypes = 0
-    const unitValues = Object.values(unitsForAttack)
-    unitValues.forEach((unitValue: any) => {
-      if (Number(unitValue.split("-")[0])) {
-        numberOfUnitTypes += 1
-      }
-    })
-
-    const payloadTypeArgs = [...selectedEnemy?.rewardCoinTypes, unitType1]
-    const payloadArgs = [selectedEnemy?.levelId, numberOfUnits1ForAttack * (10 ** Decimals)]
-
-    let unitType2, unitId2, numberOfUnits2ForAttack
-
-    if (numberOfUnitTypes === 2) {
-      unitType2 = String(Object.values(unitsForAttack)[1])?.split("-")[1]
-      unitId2 = Object.keys(unitsForAttack)[1]
-      numberOfUnits2ForAttack = unitsForAttack[unitId2].split("-")[0]
-      payloadTypeArgs.push(unitType2)
-      payloadArgs.push(numberOfUnits2ForAttack * (10 ** Decimals), unitId1, unitId2)
-    } else {
-      payloadArgs.push(unitId1)
-    }
-
-    let attackType
-
-    if (selectedEnemy.rewardCoinTypes.length > 1 && numberOfUnitTypes > 1) {
-      attackType = "attack_enemy_with_two_units_two_reward"
-    } else if (selectedEnemy.rewardCoinTypes.length === 1 && numberOfUnitTypes > 1) {
-      attackType = "attack_enemy_with_two_units_one_reward"
-    } else if (selectedEnemy.rewardCoinTypes.length === 1 && numberOfUnitTypes === 1) {
-      attackType = "attack_enemy_with_one_unit_one_reward"
-    } else {
-      attackType = "attack_enemy_with_one_unit_two_reward"
-    }
-
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${packageName}::${attackType}`,
-      // <RewardCoin1Type/RewardCoin2Type, UnitType1/UnitType2 
-      type_arguments: payloadTypeArgs,
-      // for 1 unit - enemy_level_id: u64, number_of_units: u64, unit_id: u64
-      // for 2 units - enemy_level_id: u64, number_of_units_1: u64, number_of_units_2: u64, unit_id_1: u64, unit_id_2: u64,
-      arguments: payloadArgs,
-    }
-
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
-      // getContractsList()
-      // setSelectedContract('')
-      setSelectedEnemy(null)
-      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
-    } catch (e) {
-      console.log("ERROR during attack enemy")
       console.log(e)
     }
   }
@@ -173,29 +82,6 @@ const Player = () => {
       setOwnerAddress(String(viewResponse[0]))
     } catch(e) {
       console.log("Error during getting resource account addres")
-      console.log(e)
-    }
-  }
-
-  const onAirdropResources = async () => {
-    const packageName = "pve_battles"
-  
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${packageName}::mint_coins`,
-      type_arguments: [],
-      arguments: []
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      toast.promise(client.waitForTransactionWithResult(tx.hash), {
-        pending: 'Airdrop some coins...',
-        success: 'Airdrop received',
-        error: 'Error during coins airdrop'
-      })
-      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
-    } catch (e) {
-      console.log("ERROR during mint coins")
       console.log(e)
     }
   }
@@ -344,10 +230,29 @@ const Player = () => {
     }
   }
 
+  const getTradingPairs = async () => {
+    const payload = {
+      function: `${CONFIG.swapModule}::${CONFIG.swapPackageName}::get_all_pairs`,
+      type_arguments: [],
+      arguments: []
+    }
+
+    try {
+      const allPairsResponse: any = await provider.view(payload)
+      const tradingPairs = allPairsResponse[0].data
+      console.log("Initial pair: ", tradingPairs[0])
+      setSelectedPairData(tradingPairs[0])
+    } catch(e) {
+      console.log("Error during getting all trading pairs")
+      console.log(e)
+    }
+  }
+
   useEffect(() => {
     if (account) {
       getCollectionOwnerAddress()
       getUnitsList()
+      getTradingPairs()
     }
   }, [account])
 
@@ -383,7 +288,7 @@ const Player = () => {
         {(tokenBalances && tokenBalances.length < 2) || tokenBalances.length === 0 ? (
           <Tippy content="Mint a planet with random level property">
             <Button
-              onClick={onMintPlanet}
+              onClick={() => mintPlanet(ownerAddress, signAndSubmitTransaction, apolloClient)}
               type='primary'
             >
               Mint A Planet
@@ -394,7 +299,7 @@ const Player = () => {
         {(coinBalances.length > 0 && coinBalances.find((coinBalance) => coinBalance.coin_info.name === 'Minerals' &&  coinBalance.amount < 1000 * 10 ** Decimals)) || coinBalances.length === 0 ? (
           <Tippy content="Airdrop 10 000 Minerals and 10 000 Energy Crystals">
             <Button
-              onClick={onAirdropResources}
+              onClick={() => airdropResources(signAndSubmitTransaction, apolloClient)}
               style={{ marginLeft: '8px' }}
               type='primary'
             >
@@ -417,6 +322,11 @@ const Player = () => {
           setUnclaimedReward(0)  
         }}
       />
+      {/* Swap UI */}
+      <h2 className='white-text'>You can swap your resources to another one using Trading Post:</h2>
+      <SwapContainer
+        selectedPairData={selectedPairData}
+      />
       <div className="divider" />
       {/* PvE UI */}
       <span className='white-text'>After you collect some resources, you can hire units to fight with pirates:</span>
@@ -436,9 +346,7 @@ const Player = () => {
         onCancel={() => setSelectedEnemy(null)}
         unitsList={unitsList}
         selectedEnemy={selectedEnemy}
-        onAttackEnemy={onAttackEnemy}
       />
-      {/* Swap UI */}
       
     </>
   )
