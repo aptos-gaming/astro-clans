@@ -10,11 +10,11 @@ const Home = () => {
     <div className='homePage'>
       <div className='buttons'>
         <Button type="primary" onClick={() => navigate('/play')}>
-          Player
+          Play in Testnet
         </Button>
-        <Button type="primary" onClick={() => navigate('/admin')}>
+        {/* <Button type="primary" onClick={() => navigate('/admin')}>
           Admin
-        </Button>
+        </Button> */}
       </div>
     </div>
   )

@@ -282,7 +282,7 @@ const Player = () => {
       <Alert 
         type="info"
         message="Resource extraction"
-        description="Start extracting minerals from your planets. The yield is determined by the planet's level. By upgrading your planets, you can boost the resource income."
+        description="Start extracting gasolineium from your planets. The yield is determined by the planet's level. By upgrading your planets, you can boost the resource income."
         showIcon
       />
       <TokensList />
@@ -303,18 +303,27 @@ const Player = () => {
 
   const SwapUI = () => (
     <>
-      <h2 className='white-text'>You can swap your resources using Trading Post:</h2>
+      <Alert 
+        type="info"
+        message="Trading post"
+        description="You can only extract gasolineium from your planets. To obtain other resources, such as hypersteel and minerals, visit the trading post."
+        showIcon
+      />
       <SwapContainer
         selectedPairData={selectedPairData}
       />
-      <div className="divider" />
     </>
   );
 
   const PvEUI = () => (
     <>
-      <span className='white-text'>After you collect some resources, you can hire units to fight with pirates:</span>
-      <h2 className='white-text'>Units to Buy:</h2>
+      <Alert 
+        type="info"
+        message="Space fleet"
+        description="Recruite mercenaries and send them to hunt space pirates. The more units you send, the higher the chance of success. If you succeed, you will be rewarded with gasolineium and hypersteel."
+        showIcon
+        style={{ marginBottom: '16px' }}
+      />
       <ContractsList onSelectedContract={setSelectedContract} unitsList={unitsList} />
       <BuyUnitsModal
         maxUnits={maxUnits}
@@ -322,7 +331,13 @@ const Player = () => {
         onCancel={() => setSelectedContract(null)}
         selectedContract={selectedContract}
       />
-      <h2 className='white-text'>Enemies to Attack:</h2>
+      <Alert 
+        type="warning"
+        message="Hunt space pirates!"
+        description="You have been attacked by space pirates! Send your mercenaries to defend your planets. If you succeed, you will be rewarded with gasolineium and hypersteel."
+        showIcon
+        style={{ marginBottom: '16px' }}
+      />
       <EnemiesList setSelectedEnemy={setSelectedEnemy} />
       <AttackEnemyModal
         onCancel={() => setSelectedEnemy(null)}
@@ -360,13 +375,13 @@ const Player = () => {
         ) : null}
       </div>
       <Tabs defaultActiveKey="1">
-        <TabPane tab="Staking" key="1">
+        <TabPane tab="Planet base" key="1">
           <StakingUI />
         </TabPane>
-        <TabPane tab="Swap" key="2">
+        <TabPane tab="Trading post" key="2">
           <SwapUI />
         </TabPane>
-        <TabPane tab="PvE" key="3">
+        <TabPane tab="Space battles" key="3">
           <PvEUI />
         </TabPane>
       </Tabs>

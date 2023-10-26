@@ -1,19 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap");
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
   background: rgb(24, 19, 46);
   background: radial-gradient(circle, rgba(24, 19, 46, 1) 0%, rgba(42, 50, 91, 1) 35%, rgba(0, 0, 0, 1) 100%);
-  background: url('https://opengameart.org/sites/default/files/bg_space_seamless_1.png');
+  background: url("https://opengameart.org/sites/default/files/bg_space_seamless_1.png");
   padding-left: 10%;
   padding-right: 10%;
   -ms-overflow-style: none;
-	scrollbar-width: none;
-	&::-webkit-scrollbar {
-		display: none;
-	}
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 #root {
@@ -25,29 +25,26 @@ body {
   margin: 0 auto;
 }
 
-label, h3, p {
+label,
+h3,
+p {
   color: white !important;
 }
 
 .balances-container {
   display: flex;
   flex-direction: row;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
   flex-wrap: wrap;
-  border-bottom: 1px solid #707381;
-  padding-bottom: 25px;
 }
 
 .balance-container {
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: #fff;
   font-weight: 300;
-  padding: 10px 20px;
+  padding: 5px 10px;
   border-radius: 15px;
   border: 1px solid #89898a;
   margin-right: 1rem;
-  margin-top: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,7 +71,7 @@ label, h3, p {
   margin: 0 auto;
   margin-top: 4rem;
   margin-bottom: 4rem;
-  background-image: url('/space-pirate.png');
+  background-image: url("/space-pirate.png");
   background-size: 200px;
   background-repeat: no-repeat;
   background-position: right;
@@ -130,7 +127,8 @@ label, h3, p {
   justify-content: center;
 }
 
-.swaps-container .icons-container img:hover, .swaps-container .icons-container .swap-from-value:hover {
+.swaps-container .icons-container img:hover,
+.swaps-container .icons-container .swap-from-value:hover {
   cursor: pointer;
 }
 
@@ -138,7 +136,8 @@ label, h3, p {
   padding: 0.5rem;
 }
 
-.dex .swap-from, .dex .swap-to {
+.dex .swap-from,
+.dex .swap-to {
   border-radius: 0.5rem;
   background-color: rgb(19, 26, 42);
   padding: 12px;
@@ -147,7 +146,7 @@ label, h3, p {
 }
 
 .coin-name {
-  padding: 0; 
+  padding: 0;
   margin: 0;
   margin-bottom: 0.5rem;
 }
@@ -159,7 +158,8 @@ label, h3, p {
   font-size: 1.5rem;
 }
 
-.swap-from, .swap-to {
+.swap-from,
+.swap-to {
   z-index: 1;
   margin-right: -0.75rem;
   display: flex;
@@ -168,11 +168,13 @@ label, h3, p {
   width: 100%;
 }
 
-.swap-from input, .swap-to input {
+.swap-from input,
+.swap-to input {
   width: 100%;
 }
 
-.first-coin, .second-coin {
+.first-coin,
+.second-coin {
   display: flex;
   flex-direction: column;
 }
@@ -247,7 +249,7 @@ input::-webkit-inner-spin-button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .itemImage img {
@@ -256,7 +258,7 @@ input::-webkit-inner-spin-button {
   cursor: pointer;
 }
 
- /* Zoom and rotate planets on hover */
+/* Zoom and rotate planets on hover */
 
 .itemImage img {
   transition: transform 2s;
@@ -300,13 +302,21 @@ input::-webkit-inner-spin-button {
   margin-top: 1rem;
 }
 
-.ant-tabs-tab, .white-text {
+.ant-tabs-tab,
+.white-text {
   color: white;
 }
 
 .tip-text {
   color: white;
   font-size: 12px;
+}
+
+.enemyItem {
+  background: #0000002e;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #ffffff3d;
 }
 
 .enemyItem:hover {
@@ -317,7 +327,8 @@ input::-webkit-inner-spin-button {
   text-align: center;
 }
 
-.buy-units-buttons, .black-text {
+.buy-units-buttons,
+.black-text {
   color: black !important;
 }
 

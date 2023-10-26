@@ -60,6 +60,8 @@ const StakePlanetModal = ({
       </div>
       <p className="unclaimed-reward-text">
         Unclaimed reward: <span style={{ color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>{unclaimedReward} {rewardCoinType ? rewardCoinType.split('::')[2] : ''}</span>
+        <br />
+        <pre>Upgrade cost: Level * 100 gasolineium</pre>
       </p>
     </Modal>
   )

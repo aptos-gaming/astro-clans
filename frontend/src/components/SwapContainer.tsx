@@ -46,6 +46,7 @@ const SwapContainer = ({ selectedPairData }: SwapContainerProps) => {
               <Input
                 type="number"
                 value={coinFromAmount}
+                min={0}
                 onChange={(e) => {
                   if (!e.target.value) {
                     return setCoinFromAmount('')
@@ -59,6 +60,7 @@ const SwapContainer = ({ selectedPairData }: SwapContainerProps) => {
                 <p className='coin-name'>{formatCoinName(selectedPairData.value.coins_from_name[1])}</p>
                 <Input
                   type="number"
+                  min={0}
                   value={coinFromAmount}
                   onChange={(e) => {
                     setCoinFromAmount(new Decimal(e.target.value).toString())
