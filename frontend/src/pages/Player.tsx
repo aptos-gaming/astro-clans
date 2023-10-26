@@ -293,7 +293,7 @@ const Player = () => {
         ) : null}
         {/* allow airdrop only if user hasnt any coins or has less then 1000 Minerals */}
         {(coinBalances.find((coinBalance) => coinBalance.coin_info.name === 'Gasolineium' &&  coinBalance.amount < 10 * 10 ** Decimals)) || coinBalances.length === 0 ? (
-          <Tippy content="Airdrop 10 Gasolineium and 10 Hypersteel">
+          <Tippy content="Airdrop 100 Gasolineium and 50 Hypersteel">
             <Button
               onClick={() => airdropResources(signAndSubmitTransaction, apolloClient)}
               style={{ marginLeft: '8px' }}
