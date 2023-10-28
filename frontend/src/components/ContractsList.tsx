@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Col } from 'antd' 
-import { Provider, Network } from "aptos"
 
 import { hexToText } from './AllContractsTable';
-import CONFIG from '../config.json'
+import { provider } from '../aptosClient';
 import { Contract, Unit } from '../types';
-
-const PackageName = "pve_battles"
-
-const provider = new Provider(CONFIG.network === "devnet" ? Network.DEVNET : Network.TESTNET)
-
+import CONFIG from '../config.json'
 
 interface RowItemProps {
   rowData: Contract;
@@ -29,7 +24,7 @@ const ContractsList = ({ onSelectedContract, unitsList }: ContractsListProps) =>
 
   const getContractsList = async () => {
     const payload = {
-      function: `${CONFIG.pveModule}::${PackageName}::get_all_unit_contracts`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::get_all_unit_contracts`,
       type_arguments: [],
       arguments: [CONFIG.pveOwner]
     }

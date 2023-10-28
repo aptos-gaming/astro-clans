@@ -213,8 +213,9 @@ module owner_addr::staking {
     let admin_data = borrow_global<AdminData>(collection_owner_addr);
     let admin_signer_from_cap = account::create_signer_with_capability(&admin_data.signer_cap);
 
-    // generate random number from 0 to 10
-    let random_number = utils::random(user_addr, 10);
+    // generate random number from 0 to 9
+    let random_number = utils::random(user_addr, 9);
+    random_number = random_number + 1;
 
     let collection_name = string::utf8(b"Astro Clans");
     let collection_description = string::utf8(b"Astro Clans collection");
@@ -222,19 +223,19 @@ module owner_addr::staking {
     string::append(&mut token_name, string_utils::to_string(&random_number));
 
     let token_uri = string::utf8(b"https://raw.githubusercontent.com/aptos-gaming/public-assets/main/planets/");
-    string:: append(&mut token_uri, string_utils::to_string(&random_number));
+    string::append(&mut token_uri, string_utils::to_string(&random_number));
     string::append(&mut token_uri, string::utf8(b".png"));
 
     let token_object = aptos_token::mint_token_object(
-        &admin_signer_from_cap,
-        collection_name,
-        collection_description,
-        token_name,
-        token_uri,
-        vector<String>[string::utf8(b"level")],
-        vector<String>[string::utf8(b"u64") ],
-        vector<vector<u8>>[bcs::to_bytes<u64>(&random_number)],
-      );
+      &admin_signer_from_cap,
+      collection_name,
+      collection_description,
+      token_name,
+      token_uri,
+      vector<String>[string::utf8(b"level")],
+      vector<String>[string::utf8(b"u64") ],
+      vector<vector<u8>>[bcs::to_bytes<u64>(&random_number)],
+    );
       
     // transfer token from resource account to the main account
     object::transfer<aptos_token::AptosToken>(&admin_signer_from_cap, token_object, user_addr);

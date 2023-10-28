@@ -12,9 +12,6 @@ import CONFIG from "../../config.json"
 
 const { Option } = Select;
 
-const PackageName = "swap_coins"
-
-
 const Decimals = 8
 
 export const multipleWithDecimal = (miltiplier: string | number, amount: number | string = 100): string => {
@@ -99,7 +96,7 @@ export const CreatePairForm = ({ getAllTradingPairs }: any) => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.swapModule}::${PackageName}::${pairType}`,
+      function: `${CONFIG.swapModule}::${CONFIG.swapPackageName}::${pairType}`,
       type_arguments: typeArguments,
       // exchange_rate, coin_a_amount, coin_b_amount
       arguments: args,

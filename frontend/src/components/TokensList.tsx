@@ -10,7 +10,6 @@ import CONFIG from '../config.json'
 
 interface RowItemProps {
   rowData: any;
-  packageName: string;
   setSelectedToken: (data: any) => void;
 }
 
@@ -35,7 +34,6 @@ export const AccountTokensV2WithDataQuery = gql
     }
   }
 `
-const PackageName = "staking"
 
 export const TokensList = () => {
   const [tokens, setTokens] = useState<TokenV2Props[]>([])
@@ -63,11 +61,11 @@ export const TokensList = () => {
     }
   }, [data])
   
-  const RowItem: React.FC<RowItemProps> = ({ rowData, packageName, setSelectedToken }) => {
+  const RowItem: React.FC<RowItemProps> = ({ rowData, setSelectedToken }) => {
     return (
       <div
         className='gridItem'
-        onClick={() => setSelectedToken({ ...rowData, packageName })}
+        onClick={() => setSelectedToken({ ...rowData })}
       >
         <div className='itemImage'>
           <img
@@ -93,7 +91,6 @@ export const TokensList = () => {
           {tokens.map((rowData) => (
             <RowItem
               rowData={rowData}
-              packageName={PackageName}
               setSelectedToken={setSelectedToken}
             />
           ))}

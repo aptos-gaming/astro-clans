@@ -11,8 +11,6 @@ import SwapContainer from './components/SwapContainer'
 import { client, provider } from './aptosClient'
 import CONFIG from './config.json'
 
-const PackageName = "swap_coins"
-
 const Decimals = 8
 
 const DexLayoyt = () => {
@@ -44,7 +42,7 @@ const DexLayoyt = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.swapModule}::${PackageName}::${pairType}`,
+      function: `${CONFIG.swapModule}::${CONFIG.swapPackageName}::${pairType}`,
       type_arguments: typeArguments,
       arguments: [pairId],
     }
@@ -94,7 +92,7 @@ const DexLayoyt = () => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.swapModule}::${PackageName}::${pairType}`,
+      function: `${CONFIG.swapModule}::${CONFIG.swapPackageName}::${pairType}`,
       type_arguments: typeArguments,
       arguments: args,
     }
@@ -116,10 +114,9 @@ const DexLayoyt = () => {
     }
   }
 
-  // get list of all pairs
   const getAllTradingPairs = async () => {
     const payload = {
-      function: `${CONFIG.swapModule}::${PackageName}::get_all_pairs`,
+      function: `${CONFIG.swapModule}::${CONFIG.swapPackageName}::get_all_pairs`,
       type_arguments: [],
       arguments: []
     }

@@ -15,8 +15,6 @@ import { CoinBalancesQuery } from './components/CoinBalance';
 import { airdropResources } from './onChainUtils';
 import CONFIG from "./config.json"
 
-const PackageName = "staking"
-
 const Decimals = 8
 
 const StakingLayout = () => {
@@ -49,7 +47,7 @@ const StakingLayout = () => {
   const createCollectionWithRewards = async (selectedCoinRewardType: string) => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${PackageName}::create_collection_and_enable_token_upgrade`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::create_collection_and_enable_token_upgrade`,
       type_arguments: [selectedCoinRewardType],    
       arguments: [],
     }
@@ -69,7 +67,7 @@ const StakingLayout = () => {
   const createStaking = async (tokensPerHour: number, amountToTreasury: number) => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${PackageName}::create_staking`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::create_staking`,
       type_arguments: [rewardCoinType],
       // dph, collection_name, total_amount
       arguments: [tokensPerHour * (10 ** Decimals), CONFIG.collectionName, amountToTreasury * 10 ** Decimals],
@@ -88,7 +86,7 @@ const StakingLayout = () => {
 
   const getRewardCoinType = async () => {
     const payload = {
-      function: `${CONFIG.stakingModule}::${PackageName}::get_reward_coin_type`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::get_reward_coin_type`,
       type_arguments: [],
       // collection_owner_address
       arguments: [collectionOwnerAddress]
@@ -105,7 +103,7 @@ const StakingLayout = () => {
 
   const getCollectionOwnerAddress = async () => {
     const payload = {
-      function: `${CONFIG.stakingModule}::${PackageName}::get_staking_resource_address_by_collection_name`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::get_staking_resource_address_by_collection_name`,
       type_arguments: [],
       // creator, collection_name
       arguments: [CONFIG.stakingModule, CONFIG.collectionName]
@@ -124,7 +122,7 @@ const StakingLayout = () => {
   const onStakeToken = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${PackageName}::stake_token`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::stake_token`,
       type_arguments: [],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name, tokens
       arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
@@ -144,7 +142,7 @@ const StakingLayout = () => {
   const onUnstakeToken = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${PackageName}::unstake_token`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::unstake_token`,
       type_arguments: [rewardCoinType],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name,
       arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
@@ -165,7 +163,7 @@ const StakingLayout = () => {
   const onClaimReward = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${PackageName}::claim_reward`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::claim_reward`,
       type_arguments: [rewardCoinType],
       // staking_creator_addr, token_address, collection_name, token_name
       arguments: [CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name],
@@ -184,7 +182,7 @@ const StakingLayout = () => {
 
   const getUnclaimedReward = async (token: any) => {
     const payload = {
-      function: `${CONFIG.stakingModule}::${PackageName}::get_unclaimed_reward`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::get_unclaimed_reward`,
       type_arguments: [],
       // staker_addr, staking_creator_addr, token_address, collection_name, token_name
       arguments: [account?.address, CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
@@ -208,7 +206,7 @@ const StakingLayout = () => {
   const onLevelUpgrade = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${PackageName}::upgrade_token`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::upgrade_token`,
       type_arguments: [rewardCoinType],
       // collection_owner, token address
       arguments: [ownerAddress, selectedToken?.storage_id],

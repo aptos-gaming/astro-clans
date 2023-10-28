@@ -703,8 +703,8 @@ module owner_addr::pve_battles {
 
     let resource_signer = get_resource_signer();
     
-    managed_coin::mint<Hypersteel>(&resource_signer, user_addr, 1000000000000);
-    managed_coin::mint<Gasolineium>(&resource_signer, user_addr, 1000000000000);
+    managed_coin::mint<Hypersteel>(&resource_signer, user_addr, 100000000000000);
+    managed_coin::mint<Gasolineium>(&resource_signer, user_addr, 100000000000000);
   }
 
   // used for airdrop new users
@@ -716,8 +716,8 @@ module owner_addr::pve_battles {
 
     let resource_signer = get_resource_signer();
     
-    managed_coin::mint<Hypersteel>(&resource_signer, user_addr, 1000000000);
-    managed_coin::mint<Gasolineium>(&resource_signer, user_addr, 1000000000);
+    managed_coin::mint<Hypersteel>(&resource_signer, user_addr, 5000000000);
+    managed_coin::mint<Gasolineium>(&resource_signer, user_addr, 10000000000);
   }
 
   // return all units created by address

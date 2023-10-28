@@ -8,8 +8,6 @@ import CONFIG from "../../config.json"
 
 const { Option } = Select;
 
-const PackageName = "pve_battles"
-
 const layout = {
   labelCol: { span: 3 },
 };
@@ -42,13 +40,14 @@ const CreateUnitContractForm = ({ unitsList, getContractsList }: CreateUnitContr
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${PackageName}::create_unit_contract`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::create_unit_contract`,
       // resource_type, unit_type
       type_arguments: [selectedResourceType, unitData.value.linked_coin_type],
       // unit_id: u64, fixed_price: u64
       arguments: [selectedUnitId, fixedPrice]
     }
     try {
+      // @todo: add toast promise
       const tx = await signAndSubmitTransaction(payload)
       await client.waitForTransactionWithResult(tx.hash)
       getContractsList()

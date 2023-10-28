@@ -8,8 +8,6 @@ import CONFIG from "../../config.json"
 
 const { Option } = Select;
 
-const PackageName = "pve_battles"
-
 const layout = {
   labelCol: { span: 3 },
 };
@@ -46,7 +44,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${PackageName}::${enemyLevelType}`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::${enemyLevelType}`,
       type_arguments: [...selectedResourceType],
       // name: String, attack: u64, health: u64, image_url: String, reward_coin_1_amount: u64 / reward_coin_2_amount: u64
       arguments: payloadArgs

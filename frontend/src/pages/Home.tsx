@@ -1,10 +1,9 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom'
 import { Button } from 'antd'
 
 const Home = () => {
-  let navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <div className='homePage'>
@@ -12,9 +11,11 @@ const Home = () => {
         <Button type="primary" onClick={() => navigate('/play')}>
           Play in Testnet
         </Button>
-        {/* <Button type="primary" onClick={() => navigate('/admin')}>
+        {/*
+        <Button type="primary" onClick={() => navigate('/admin')}>
           Admin
-        </Button> */}
+        </Button>
+        */}
       </div>
     </div>
   )

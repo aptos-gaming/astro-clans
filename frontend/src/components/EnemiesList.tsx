@@ -6,10 +6,7 @@ import { Provider, Network } from "aptos"
 import CONFIG from '../config.json'
 import { Enemy } from '../types';
 
-const PackageName = "pve_battles"
-
 const provider = new Provider(CONFIG.network === "devnet" ? Network.DEVNET : Network.TESTNET)
-
 
 interface RowItemProps {
   rowData: Enemy;

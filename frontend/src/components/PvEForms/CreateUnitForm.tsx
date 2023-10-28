@@ -6,8 +6,6 @@ import { Unit } from '../../types'
 import { client } from "../../aptosClient"
 import CONFIG from "../../config.json"
 
-const PackageName = "pve_battles"
-
 const layout = {
   labelCol: { span: 3 },
 }
@@ -32,7 +30,7 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
   const onCreateUnitType = async () => {
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${PackageName}::create_unit_type`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::create_unit_type`,
       type_arguments: [],
       arguments: [String(unitsList.length + 1)]
     }
@@ -55,7 +53,7 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
 
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${PackageName}::create_unit`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::create_unit`,
       type_arguments: [coinType],
       arguments: [name, symbol, description, imageUrl, attack, health]
     }

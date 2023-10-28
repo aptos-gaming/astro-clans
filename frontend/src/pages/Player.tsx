@@ -46,9 +46,8 @@ const Player = () => {
   const [selectedPairData, setSelectedPairData] = useState<any>(null)
 
   const getUnitsList = async () => {
-    const packageName = "pve_battles"
     const payload = {
-      function: `${CONFIG.pveModule}::${packageName}::get_all_units`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::get_all_units`,
       type_arguments: [],
       arguments: [CONFIG.pveOwner]
     }
@@ -63,10 +62,8 @@ const Player = () => {
   }
 
   const getCollectionOwnerAddress = async () => {
-    const packageName = "staking"
-
     const payload = {
-      function: `${CONFIG.stakingModule}::${packageName}::get_staking_resource_address_by_collection_name`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::get_staking_resource_address_by_collection_name`,
       type_arguments: [],
       // creator, collection_name
       arguments: [CONFIG.stakingModule, CONFIG.collectionName]
@@ -82,11 +79,9 @@ const Player = () => {
   }
 
   const onBuyUnits = async (numberOfUnits: number) => {
-    const packageName = "pve_battles"
-
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${packageName}::buy_units`,
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::buy_units`,
       // <CoinType, UnitType>
       type_arguments: [selectedContract?.coinType, selectedContract.unitType],
       // contract_id: u64, coins_amount: u64, number_of_units: u64
@@ -104,11 +99,9 @@ const Player = () => {
   }
 
   const onStakeToken = async () => {
-    const packageName="staking"
-
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${packageName}::stake_token`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::stake_token`,
       type_arguments: [],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name, tokens
       arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
@@ -126,11 +119,9 @@ const Player = () => {
   }
 
   const onUnstakeToken = async () => {
-    const packageName="staking"
-
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${packageName}::unstake_token`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::unstake_token`,
       type_arguments: [rewardCoinType],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name,
       arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
@@ -149,11 +140,9 @@ const Player = () => {
   }
 
   const onClaimReward = async () => {
-    const packageName="staking"
-
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${packageName}::claim_reward`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::claim_reward`,
       type_arguments: [rewardCoinType],
       // staking_creator_addr, token_address, collection_name, token_name
       arguments: [CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name],
@@ -172,9 +161,8 @@ const Player = () => {
 
 
   const getUnclaimedReward = async (token: any) => {
-    const packageName="staking"
     const payload = {
-      function: `${CONFIG.stakingModule}::${packageName}::get_unclaimed_reward`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::get_unclaimed_reward`,
       type_arguments: [],
       // staker_addr, staking_creator_addr, token_address, collection_name, token_name
       arguments: [account?.address, CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
@@ -190,10 +178,9 @@ const Player = () => {
   }
 
   const onLevelUpgrade = async () => {
-    const packageName = "staking"
     const payload = {
       type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${packageName}::upgrade_token`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::upgrade_token`,
       type_arguments: [rewardCoinType],
       // collection_owner, token address
       arguments: [ownerAddress, selectedToken?.storage_id],
@@ -210,9 +197,8 @@ const Player = () => {
   }
 
   const getRewardCoinType = async () => {
-    const packageName = "staking"
     const payload = {
-      function: `${CONFIG.stakingModule}::${packageName}::get_reward_coin_type`,
+      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::get_reward_coin_type`,
       type_arguments: [],
       // collection_owner_address
       arguments: [ownerAddress]
