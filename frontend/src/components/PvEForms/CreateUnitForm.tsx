@@ -1,6 +1,7 @@
-import React, { useState } from "react"
-import { Form, Input, Button } from "antd"
-import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import React, { useState } from 'react'
+import { Form, Input, Button } from 'antd'
+import { useWallet } from '@aptos-labs/wallet-adapter-react'
+import { toast } from 'react-toastify'
 
 import { Unit } from '../../types'
 import { client } from "../../aptosClient"
@@ -59,7 +60,11 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Creating new unit...',
+        success: 'New unit created',
+        error: 'Error during creating unit'
+      })
       getUnitsList()
       setName('')
       setDescription('')

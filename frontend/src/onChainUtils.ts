@@ -1,20 +1,20 @@
 import { toast } from 'react-toastify'
+import { ApolloClient } from '@apollo/client'
 
-import { formatCoinName, multipleWithDecimal } from './components/DexForms/CreatePairForm'
+import { multipleWithDecimal } from './components/DexForms/CreatePairForm'
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { AccountTokensV2WithDataQuery } from './components/TokensList'
 import { client } from './aptosClient'
+import { SwapPair } from './types'
 import CONFIG from './config.json'
 
 const Decimals = 8
 
 async function swap (
   coinFromAmount: number,
-  // @todo: add type here
-  selectedPairData: any,
+  selectedPairData: SwapPair | null,
   signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
-  // @todo: add type here
-  apolloClient: any,
+  apolloClient: ApolloClient<{}>,
 ) {
   if (!selectedPairData) {
     alert("Select one of the pairs please")
@@ -62,8 +62,7 @@ async function attackEnemy (
   selectedEnemy: any,
   unitsForAttack: any,
   signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
-  // @todo: add type here
-  apolloClient: any,
+  apolloClient: ApolloClient<{}>,
 ) {
   const unitType1 = String(Object.values(unitsForAttack)[0])?.split("-")[1]
   const unitId1 = Object.keys(unitsForAttack)[0]
@@ -131,8 +130,7 @@ async function attackEnemy (
 
 const airdropResources = async (
   signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
-  // @todo: add type here
-  apolloClient: any,
+  apolloClient: ApolloClient<{}>,
   userType?: string,
 ) => {
   const payload = {
@@ -158,8 +156,7 @@ const airdropResources = async (
 const mintPlanet = async (
   ownerAddress: string,
   signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
-  // @todo: add type here
-  apolloClient: any,  
+  apolloClient: ApolloClient<{}>,
 ) => {
   if (!ownerAddress) {
     toast.error('No owner address')

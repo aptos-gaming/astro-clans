@@ -23,8 +23,6 @@ const StakingLayout = () => {
   const { collectionOwnerAddress, setCollectionOwnerAddress } = useCollectionOwner()
   const apolloClient = useApolloClient()
 
-  // @todo: remove this as it dublicates collectionOwnerAddress
-  const [ownerAddress, setOwnerAddress] = useState('')
   const [rewardCoinType, setRewardCoinType] = useState('')
 
   const { account, signAndSubmitTransaction } = useWallet();
@@ -112,7 +110,6 @@ const StakingLayout = () => {
     try {
       const viewResponse = await provider.view(payload)
       setCollectionOwnerAddress(String(viewResponse[0]))
-      setOwnerAddress(String(viewResponse[0]))
     } catch(e) {
       console.log("Error during getting resource account addres")
       console.log(e)
@@ -125,7 +122,7 @@ const StakingLayout = () => {
       function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::stake_token`,
       type_arguments: [],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name, tokens
-      arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
+      arguments: [CONFIG.stakingModule, collectionOwnerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
@@ -145,7 +142,7 @@ const StakingLayout = () => {
       function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::unstake_token`,
       type_arguments: [rewardCoinType],
       // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name,
-      arguments: [CONFIG.stakingModule, ownerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
+      arguments: [CONFIG.stakingModule, collectionOwnerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
@@ -209,7 +206,7 @@ const StakingLayout = () => {
       function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::upgrade_token`,
       type_arguments: [rewardCoinType],
       // collection_owner, token address
-      arguments: [ownerAddress, selectedToken?.storage_id],
+      arguments: [collectionOwnerAddress, selectedToken?.storage_id],
     }
     try {
       const tx = await signAndSubmitTransaction(payload)

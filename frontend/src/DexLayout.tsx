@@ -9,6 +9,7 @@ import { AllPairsTable, CreatePairForm } from './components'
 import { formatCoinName, multipleWithDecimal } from './components/DexForms/CreatePairForm'
 import SwapContainer from './components/SwapContainer'
 import { client, provider } from './aptosClient'
+import { SwapPair } from './types'
 import CONFIG from './config.json'
 
 const Decimals = 8
@@ -17,7 +18,7 @@ const DexLayoyt = () => {
   const { account, signAndSubmitTransaction } = useWallet()
   const apolloClient = useApolloClient()
 
-  const [selectedPairData, setSelectedPairData] = useState<any>(null)
+  const [selectedPairData, setSelectedPairData] = useState<SwapPair | null>(null)
   const [tradingPairs, setTradingPairs] = useState([])
   const [isIncreaseReservesVisible, setIsIncreaseReservesVisible] = useState(false)
 
@@ -61,7 +62,7 @@ const DexLayoyt = () => {
   }
 
   const onIncreaseReserves = async () => {
-    if (!coinAAmountReserve || !coinBAmountReserve) {
+    if (!coinAAmountReserve || !coinBAmountReserve || !selectedPairData) {
       alert("Put some value in inputs")
       return
     }
@@ -154,13 +155,13 @@ const DexLayoyt = () => {
         </Col>
         <Modal
           title="Increase reserves"
-          open={isIncreaseReservesVisible && selectedPairData}
+          open={isIncreaseReservesVisible && !!selectedPairData}
           onCancel={() => setIsIncreaseReservesVisible(false)}
           onOk={onIncreaseReserves}
           okText="Increase"
         >
           <Form className="increase-reserves-form">
-            <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_from_name[0])}`}>
+            <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_from_name[0] || '')}`}>
               <Input
                 type="number"
                 value={coinAAmountReserve}
@@ -168,7 +169,7 @@ const DexLayoyt = () => {
                 placeholder="Amount of coins From moved to reserve"
               />
             </Form.Item>
-            <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_to_name[0])}`}>
+            <Form.Item label={`Amount of coins ${formatCoinName(selectedPairData?.value?.coins_to_name[0] || '')}`}>
               <Input
                 type="number"
                 value={coinCAmountReserve}

@@ -38,3 +38,17 @@ export type Contract = {
     fixed_price: string,
   }
 }
+
+export type SwapPair = {
+  key: string,
+  value: {
+    coins_from: Array<TypeInfo>,
+    coins_to: Array<TypeInfo>,
+    coins_from_name: Array<string>,
+    coins_to_name: Array<string>,
+    coins_from_reserves: Array<number>,
+    coins_to_reserves: Array<number>,
+    exchange_rates: Array<number>,
+    creator: string,
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Form, Input, Button, Select } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import  { toast } from 'react-toastify'
 
 import useCoinBalances from "../../context/useCoinBalances"
 import { client } from "../../aptosClient"
@@ -29,7 +30,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
   const [rewardCoin2Amount, setRewardCoin2Amount] = useState(100)
   const [selectedResourceType, setSelectedResourceType] = useState<Array<string>>([])
 
-  const onCreateLevel = async () => {
+  const onCreateEnemy = async () => {
     if (!name || !attack || !health || !rewardCoin1Amount || (selectedResourceType.length > 1 && !rewardCoin2Amount) || !imageUrl) {
       alert("Missing required fields")
       return
@@ -51,7 +52,11 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
     }
     try {
       const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Creating new enemy...',
+        success: 'New enemy created',
+        error: 'Error during creating new enemy'
+      })
       getEnemysList()
       setName('')
       setAttack(0)
@@ -142,7 +147,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
         </Form.Item>
       )}
       <Form.Item style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center'}}>
-        <Button onClick={onCreateLevel} type="primary">Create Enemy</Button>
+        <Button onClick={onCreateEnemy} type="primary">Create Enemy</Button>
       </Form.Item>
     </Form>
   )

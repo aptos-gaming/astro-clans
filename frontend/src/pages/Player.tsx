@@ -19,7 +19,7 @@ import {
   SwapContainer,
 } from '../components'
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
-import { Unit } from '../types'
+import { SwapPair, Unit } from '../types'
 import { client, provider } from '../aptosClient'
 import { airdropResources, mintPlanet } from '../onChainUtils'
 import CONFIG from '../config.json'
@@ -43,7 +43,7 @@ const Player = () => {
   const [maxUnits, setMaxUnits] = useState(0)
   const [unclaimedReward, setUnclaimedReward] = useState(0)
   const [rewardCoinType, setRewardCoinType] = useState('')
-  const [selectedPairData, setSelectedPairData] = useState<any>(null)
+  const [selectedPairData, setSelectedPairData] = useState<SwapPair | null>(null)
 
   const getUnitsList = async () => {
     const payload = {
@@ -295,9 +295,7 @@ const Player = () => {
         description="You can only extract gasolineium from your planets. To obtain other resources, such as hypersteel and minerals, visit the trading post."
         showIcon
       />
-      <SwapContainer
-        selectedPairData={selectedPairData}
-      />
+      <SwapContainer selectedPairData={selectedPairData} />
     </>
   );
 

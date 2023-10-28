@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Form, Input, Button, Select } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import { toast } from 'react-toastify'
 
 import useCoinBalances from "../../context/useCoinBalances"
 import { client } from '../../aptosClient'
@@ -34,7 +35,7 @@ const CreateUnitContractForm = ({ unitsList, getContractsList }: CreateUnitContr
 
     const unitData = unitsList.find((unit) => unit.key === selectedUnitId)
     if (!unitData) {
-      alert("Cannt find valid unit from UnitsList")
+      alert("Cannot find valid unit from UnitsList")
       return
     }
 
@@ -47,9 +48,12 @@ const CreateUnitContractForm = ({ unitsList, getContractsList }: CreateUnitContr
       arguments: [selectedUnitId, fixedPrice]
     }
     try {
-      // @todo: add toast promise
       const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
+      toast.promise(client.waitForTransactionWithResult(tx.hash), {
+        pending: 'Creating new unit contract...',
+        success: 'New contract created',
+        error: 'Error during creating contract',
+      })
       getContractsList()
     } catch (e) {
       console.log("ERROR during create unit contract pair tx")

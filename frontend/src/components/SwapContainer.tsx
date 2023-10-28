@@ -6,10 +6,11 @@ import Decimal from 'decimal.js'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
 
+import { SwapPair } from '../types'
 import { swap } from '../onChainUtils'
 
 interface SwapContainerProps {
-  selectedPairData: any;
+  selectedPairData: SwapPair | null;
 }
 
 const SwapContainer = ({ selectedPairData }: SwapContainerProps) => {

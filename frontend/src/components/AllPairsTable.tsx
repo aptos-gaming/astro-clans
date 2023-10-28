@@ -44,7 +44,6 @@ const AllPairsTable = ({ data, onRemovePair, openReservesModal, onSelectedPairDa
           title="Exchange Rate"
           dataIndex="value"
           key="exchange_rate"
-          // @todo: move this 100 to some Config (update CreatePairForm also)
           render={(value: any) => {
             let exchangeRates = ''
             value.exchange_rates.forEach((exchangeRate: string) => exchangeRates += Number(exchangeRate) / 100 + ", ")
