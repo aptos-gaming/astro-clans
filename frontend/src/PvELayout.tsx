@@ -18,6 +18,7 @@ import { Enemy, Unit, Contract } from './types'
 import useCoinBalances from './context/useCoinBalances'
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { client, provider } from './aptosClient'
+import { buyUnits } from './onChainUtils'
 import CONFIG from "./config.json"
 
 const Decimals = 8
@@ -139,27 +140,6 @@ const PvELayout = () => {
     }
   }
 
-  const onBuyUnits = async () => {
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::buy_units`,
-      // <CoinType, UnitType>
-      type_arguments: [selectedContract?.coinType, selectedContract.unitType],
-      // contract_id: u64, coins_amount: u64, number_of_units: u64
-      arguments: [selectedContract?.contractId, (numberOfUnits * 10 ** Decimals) * selectedContract?.fixedPrice, numberOfUnits]
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
-      getContractsList()
-      setSelectedContract('')
-      setNumberOfUnits(0)
-      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
-    } catch (e) {
-      console.log("ERROR during buy units tx")
-      console.log(e)
-    }
-  }
 
   useEffect(() => {
     if (account?.address) {
@@ -218,7 +198,17 @@ const PvELayout = () => {
       {/* Modal to buy Units */}
       <BuyUnitsModal
         maxUnits={maxUnits}
-        onBuyUnits={onBuyUnits}
+        onBuyUnits={(numberOfUnits: number) => buyUnits(
+          numberOfUnits,
+          signAndSubmitTransaction,
+          selectedContract,
+          () => {
+            getContractsList()
+            setSelectedContract('')
+            setNumberOfUnits(0)
+          },
+          apolloClient
+        )}
         onCancel={() => setSelectedContract(null)}
         selectedContract={selectedContract}
       />

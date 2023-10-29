@@ -5,7 +5,7 @@ import { multipleWithDecimal } from './components/DexForms/CreatePairForm'
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { AccountTokensV2WithDataQuery } from './components/TokensList'
 import { client } from './aptosClient'
-import { SwapPair } from './types'
+import { Contract, SwapPair } from './types'
 import CONFIG from './config.json'
 
 const Decimals = 8
@@ -118,9 +118,6 @@ async function attackEnemy (
   try {
     const tx = await signAndSubmitTransaction(payload)
     await client.waitForTransactionWithResult(tx.hash)
-    // getContractsList()
-    // setSelectedContract('')
-    // setSelectedEnemy(null)
     await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
   } catch (e) {
     console.log("ERROR during attack enemy")
@@ -182,9 +179,36 @@ const mintPlanet = async (
   }
 }
 
+async function buyUnits (
+  numberOfUnits: number,
+  signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
+  selectedContract: any,
+  onResetForms: () => void,
+  apolloClient: ApolloClient<{}>,
+) {
+  const payload = {
+    type: "entry_function_payload",
+    function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::buy_units`,
+    // <CoinType, UnitType>
+    type_arguments: [selectedContract?.coinType, selectedContract.unitType],
+    // contract_id: u64, coins_amount: u64, number_of_units: u64
+    arguments: [selectedContract?.contractId, (numberOfUnits * 10 ** Decimals) * selectedContract?.fixedPrice, numberOfUnits]
+  }
+  try {
+    const tx = await signAndSubmitTransaction(payload)
+    await client.waitForTransactionWithResult(tx.hash)
+    await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
+    onResetForms()
+  } catch (e) {
+    console.log("ERROR during buy units tx")
+    console.log(e)
+  }
+}
+
 export {
   swap,
   attackEnemy,
   airdropResources,
   mintPlanet,
+  buyUnits,
 }

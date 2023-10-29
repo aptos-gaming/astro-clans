@@ -4,8 +4,8 @@ import { Row, Col, Button, Modal, Slider, InputNumber } from 'antd'
 interface BuyUnitsModalProps {
   selectedContract: any;
   maxUnits: number;
-  onBuyUnits: (numberOfUnits: number) => Promise<void>;
   onCancel: () => void;
+  onBuyUnits: (numberOfUnits: number) => void;
 }
 
 const BuyUnitsModal = ({ selectedContract, onCancel, maxUnits, onBuyUnits }: BuyUnitsModalProps) => {

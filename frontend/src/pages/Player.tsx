@@ -21,7 +21,7 @@ import {
 import { AccountTokensV2WithDataQuery } from '../components/TokensList'
 import { SwapPair, Unit } from '../types'
 import { client, provider } from '../aptosClient'
-import { airdropResources, mintPlanet } from '../onChainUtils'
+import { airdropResources, buyUnits, mintPlanet } from '../onChainUtils'
 import CONFIG from '../config.json'
 
 const { TabPane } = Tabs;
@@ -74,26 +74,6 @@ const Player = () => {
       setOwnerAddress(String(viewResponse[0]))
     } catch(e) {
       console.log("Error during getting resource account addres")
-      console.log(e)
-    }
-  }
-
-  const onBuyUnits = async (numberOfUnits: number) => {
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::buy_units`,
-      // <CoinType, UnitType>
-      type_arguments: [selectedContract?.coinType, selectedContract.unitType],
-      // contract_id: u64, coins_amount: u64, number_of_units: u64
-      arguments: [selectedContract?.contractId, (numberOfUnits * 10 ** Decimals) * selectedContract?.fixedPrice, numberOfUnits]
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      await client.waitForTransactionWithResult(tx.hash)
-      setSelectedContract('')
-      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
-    } catch (e) {
-      console.log("ERROR during buy units tx")
       console.log(e)
     }
   }
@@ -311,9 +291,9 @@ const Player = () => {
       <ContractsList onSelectedContract={setSelectedContract} unitsList={unitsList} />
       <BuyUnitsModal
         maxUnits={maxUnits}
-        onBuyUnits={onBuyUnits}
         onCancel={() => setSelectedContract(null)}
         selectedContract={selectedContract}
+        onBuyUnits={(numberOfUnits: number) => buyUnits(numberOfUnits, signAndSubmitTransaction, selectedContract, () => setSelectedContract(''), apolloClient)}
       />
       <Alert 
         type="warning"
