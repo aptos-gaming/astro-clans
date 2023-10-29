@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Tabs } from 'antd'
+import { Alert, Button, Tabs, TabsProps } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
 import Tippy from '@tippyjs/react'
@@ -23,8 +23,6 @@ import {
   airdropResources, buyUnits, levelUpgrade, mintPlanet, stakeToken, unstakeToken, claimReward
 } from '../onChainUtils'
 import CONFIG from '../config.json'
-
-const { TabPane } = Tabs;
 
 const Decimals = 8
 
@@ -260,6 +258,21 @@ const Player = () => {
     </>
   );
 
+  const items: TabsProps['items'] = [{
+    key: '1',
+    label: 'Planet base',
+    children: <StakingUI />,
+  }, {
+    key: '2',
+    label: 'Trading post',
+    children: <SwapUI />,
+  },
+  {
+    key: '3',
+    label: 'Space battles',
+    children: <PvEUI />,
+  }]
+
   return (
     <div className='player-page-wrapper'>
       <div style={{ marginBottom: '16px' }}>
@@ -287,17 +300,7 @@ const Player = () => {
           </Tippy>
         ) : null}
       </div>
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="Planet base" key="1">
-          <StakingUI />
-        </TabPane>
-        <TabPane tab="Trading post" key="2">
-          <SwapUI />
-        </TabPane>
-        <TabPane tab="Space battles" key="3">
-          <PvEUI />
-        </TabPane>
-      </Tabs>
+      <Tabs defaultActiveKey="1" items={items} />
     </div>
   )
 }
