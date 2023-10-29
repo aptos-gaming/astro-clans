@@ -11,8 +11,7 @@ import CreateCollectioForm from './components/StakingForms/CreateCollectionForm'
 import { StakePlanetModal } from './components'
 import InitStakingForm from './components/StakingForms/InitStakingForm'
 import { client, provider } from './aptosClient'
-import { CoinBalancesQuery } from './components/CoinBalance';
-import { airdropResources } from './onChainUtils';
+import { airdropResources, levelUpgrade, stakeToken, unstakeToken, claimReward } from './onChainUtils';
 import CONFIG from "./config.json"
 
 const Decimals = 8
@@ -116,67 +115,6 @@ const StakingLayout = () => {
     }
   }
 
-  const onStakeToken = async () => {
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::stake_token`,
-      type_arguments: [],
-      // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name, tokens
-      arguments: [CONFIG.stakingModule, collectionOwnerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      setSelectedToken(null)
-      setUnclaimedReward(0)
-      await client.waitForTransactionWithResult(tx.hash)
-      await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
-    } catch (e) {
-      console.log("Error druing stake token tx")
-      console.log(e)
-    }
-  }
-
-  const onUnstakeToken = async () => {
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::unstake_token`,
-      type_arguments: [rewardCoinType],
-      // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name,
-      arguments: [CONFIG.stakingModule, collectionOwnerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      setSelectedToken(null)
-      setUnclaimedReward(0)
-      await client.waitForTransactionWithResult(tx.hash)
-      await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
-      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
-    } catch (e) {
-      console.log("Error druing unstake token tx")
-      console.log(e)
-    }
-  }
-
-  const onClaimReward = async () => {
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::claim_reward`,
-      type_arguments: [rewardCoinType],
-      // staking_creator_addr, token_address, collection_name, token_name
-      arguments: [CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name],
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      setSelectedToken(null)
-      setUnclaimedReward(0)
-      await client.waitForTransactionWithResult(tx.hash)
-      await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
-    } catch (e) {
-      console.log("Error druing claim reward tx")
-      console.log(e)
-    }
-  }
-
   const getUnclaimedReward = async (token: any) => {
     const payload = {
       function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::get_unclaimed_reward`,
@@ -200,27 +138,9 @@ const StakingLayout = () => {
     }
   }, [selectedToken])
 
-  const onLevelUpgrade = async () => {
-    const payload = {
-      type: "entry_function_payload",
-      function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::upgrade_token`,
-      type_arguments: [rewardCoinType],
-      // collection_owner, token address
-      arguments: [collectionOwnerAddress, selectedToken?.storage_id],
-    }
-    try {
-      const tx = await signAndSubmitTransaction(payload)
-      toast.promise(client.waitForTransactionWithResult(tx.hash), {
-        pending: 'Upgrading planet level...',
-        success: 'Planet level upgraded',
-        error: 'Error during planet upgrade'
-      })
-      setSelectedToken(null)
-      setUnclaimedReward(0)
-      await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
-    } catch (e) {
-      console.log("ERROR during token upgrade")
-    }
+  const resetForms = () => {
+    setSelectedToken(null)
+    setUnclaimedReward(0)
   }
 
   return (
@@ -245,10 +165,36 @@ const StakingLayout = () => {
         />
         <StakePlanetModal
           unclaimedReward={unclaimedReward}
-          onClaimReward={onClaimReward}
-          onStakeToken={onStakeToken}
-          onUnstakeToken={onUnstakeToken}
-          onLevelUpgrade={onLevelUpgrade}
+          onClaimReward={() => claimReward(
+            rewardCoinType,
+            selectedToken,
+            signAndSubmitTransaction,
+            apolloClient,
+            resetForms,
+          )}
+          onStakeToken={() => stakeToken(
+            collectionOwnerAddress || '',
+            selectedToken,
+            signAndSubmitTransaction,
+            apolloClient,
+            resetForms,
+          )}
+          onUnstakeToken={() => unstakeToken(
+            rewardCoinType,
+            collectionOwnerAddress || '',
+            selectedToken,
+            signAndSubmitTransaction,
+            apolloClient,
+            resetForms,
+          )}
+          onLevelUpgrade={() => levelUpgrade(
+            rewardCoinType,
+            collectionOwnerAddress || '',
+            selectedToken,
+            signAndSubmitTransaction,
+            apolloClient,
+            resetForms,
+          )}
           rewardCoinType={rewardCoinType}
           onHide={() => {
             setSelectedToken(null)

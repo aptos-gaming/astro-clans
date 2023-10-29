@@ -205,10 +205,124 @@ async function buyUnits (
   }
 }
 
+async function levelUpgrade(
+  rewardCoinType: string,
+  ownerAddress: string,
+  selectedToken: any,
+  signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
+  apolloClient: ApolloClient<{}>,
+  onResetForms: () => void,
+) {
+  const payload = {
+    type: "entry_function_payload",
+    function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::upgrade_token`,
+    type_arguments: [rewardCoinType],
+    // collection_owner, token address
+    arguments: [ownerAddress, selectedToken?.storage_id],
+  }
+  try {
+    const tx = await signAndSubmitTransaction(payload)
+    await client.waitForTransactionWithResult(tx.hash)
+    onResetForms()
+    await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
+  } catch (e) {
+    console.log("ERROR during token upgrade")
+  }
+}
+
+async function stakeToken(
+  collectionOwnerAddress: string,
+  selectedToken: any,
+  signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
+  apolloClient: ApolloClient<{}>,
+  onResetForms: () => void,
+) {
+  const payload = {
+    type: "entry_function_payload",
+    function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::stake_token`,
+    type_arguments: [],
+    // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name, tokens
+    arguments: [CONFIG.stakingModule, collectionOwnerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name, "1"]
+  }
+  try {
+    const tx = await signAndSubmitTransaction(payload)
+    toast.promise(client.waitForTransactionWithResult(tx.hash), {
+      pending: 'Start Mining on the planet...',
+      success: 'Succesfully started mining',
+      error: 'Error during mining on the planet'
+    })
+    await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
+    onResetForms()
+  } catch (e) {
+    console.log("Error druing stake token tx")
+    console.log(e)
+  }
+}
+
+async function unstakeToken(
+  rewardCoinType: string,
+  collectionOwnerAddress: string,
+  selectedToken: any,
+  signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
+  apolloClient: ApolloClient<{}>,
+  onResetForms: () => void,
+) {
+  const payload = {
+    type: "entry_function_payload",
+    function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::unstake_token`,
+    type_arguments: [rewardCoinType],
+    // staking_creator_addr, collection_owner_addr, token_address, collection_name, token_name,
+    arguments: [CONFIG.stakingModule, collectionOwnerAddress, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name]
+  }
+  try {
+    const tx = await signAndSubmitTransaction(payload)
+    toast.promise(client.waitForTransactionWithResult(tx.hash), {
+      pending: 'Stop Mining on the planet...',
+      success: 'Succesfully stoped mining',
+      error: 'Error during stoped mining on the planet'
+    })
+    await apolloClient.refetchQueries({ include: [AccountTokensV2WithDataQuery]})
+    await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
+    onResetForms()
+  } catch (e) {
+    console.log("Error druing unstake token tx")
+    console.log(e)
+  }
+}
+
+async function claimReward (
+  rewardCoinType: string,
+  selectedToken: any,
+  signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
+  apolloClient: ApolloClient<{}>,
+  onResetForms: () => void,
+) {
+  const payload = {
+    type: "entry_function_payload",
+    function: `${CONFIG.stakingModule}::${CONFIG.stakingPackageName}::claim_reward`,
+    type_arguments: [rewardCoinType],
+    // staking_creator_addr, token_address, collection_name, token_name
+    arguments: [CONFIG.stakingModule, selectedToken?.storage_id, CONFIG.collectionName, selectedToken?.current_token_data.token_name],
+  }
+  try {
+    const tx = await signAndSubmitTransaction(payload)
+    await client.waitForTransactionWithResult(tx.hash)
+    await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
+    onResetForms()
+  } catch (e) {
+    console.log("Error druing claim reward tx")
+    console.log(e)
+  }
+}
+
 export {
   swap,
   attackEnemy,
   airdropResources,
   mintPlanet,
   buyUnits,
+  levelUpgrade,
+  stakeToken,
+  unstakeToken,
+  claimReward,
 }
