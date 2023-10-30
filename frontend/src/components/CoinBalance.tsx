@@ -32,14 +32,14 @@ interface BalanceContainerProps {
   }
 }
 
-const BalanceContainer = ({ coinData }: any) => (
-  <Tippy content={coinData.coin_info.name}>
+const BalanceContainer = ({ amount, coin_info }: BalanceContainerProps) => (
+  <Tippy content={coin_info.name}>
     <span className='balance-container'>
       <span className="coin-symbol">
-        <img src={`/${coinData.coin_info.symbol}.png`} alt={coinData.coin_info.symbol} />
+        <img src={`/${coin_info.symbol}.png`} alt={coin_info.symbol} />
       </span>
       <span style={{ fontWeight: 'bold'}}>
-        {coinData.amount ? (coinData.amount / 10 ** Decimals).toFixed(2) : 0}
+        {amount ? (amount / 10 ** Decimals).toFixed(2) : 0}
       </span>
     </span>
   </Tippy>
@@ -64,7 +64,9 @@ const CoinBalance = () => {
 
   return (
     <Col className="balances-container">
-      {data?.current_coin_balances && data?.current_coin_balances?.length > 0 && data?.current_coin_balances?.map((coinData: BalanceContainerProps) => <BalanceContainer coinData={coinData} />)} 
+      {data?.current_coin_balances && data?.current_coin_balances?.length > 0 && data?.current_coin_balances?.map(
+        (coinData: BalanceContainerProps) => <BalanceContainer key={coinData.coin_info.symbol} {...coinData} />
+      )} 
     </Col>
   )
 }

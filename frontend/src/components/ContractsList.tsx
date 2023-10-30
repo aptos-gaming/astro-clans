@@ -90,6 +90,7 @@ const ContractsList = ({ onSelectedContract, unitsList }: ContractsListProps) =>
 
           return (
             <RowItem
+              key={rowData.key}
               rowData={rowData}
               onSelectedContract={onSelectedContract}
               unitData={unitData ? unitData as Unit : null}

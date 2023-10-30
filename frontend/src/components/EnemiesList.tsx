@@ -86,6 +86,7 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
       <div className='gridContainer'>
         {enemiesList.map((rowData) => (
           <RowItem
+            key={rowData.key}
             rowData={rowData}
             setSelectedEnemy={setSelectedEnemy}
           />

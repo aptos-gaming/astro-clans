@@ -90,6 +90,7 @@ export const TokensList = () => {
         <div className='gridContainer'>
           {tokens.map((rowData) => (
             <RowItem
+              key={rowData.storage_id}
               rowData={rowData}
               setSelectedToken={setSelectedToken}
             />

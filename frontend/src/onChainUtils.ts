@@ -5,7 +5,7 @@ import { multipleWithDecimal } from './components/DexForms/CreatePairForm'
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { AccountTokensV2WithDataQuery } from './components/TokensList'
 import { client } from './aptosClient'
-import { Contract, SwapPair } from './types'
+import { SwapPair } from './types'
 import CONFIG from './config.json'
 
 const Decimals = 8
