@@ -46,7 +46,7 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
   const RowItem: React.FC<RowItemProps> = ({ rowData, setSelectedEnemy }) => {
     return (
       <div
-        className='enemyItem'
+        className='enemy-item'
         onClick={() => {
           setSelectedEnemy({
             levelId: rowData.key,
@@ -57,19 +57,19 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
           })
         }}
       >
-        <div style={{ textAlign: 'center' }}>
-          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '18px', marginBottom: '4px' }}>{rowData.value.name}</span>
+        <div className="center-text">
+          <span className="enemy-item-name">{rowData.value.name}</span>
         </div>
         <div className='enemyContainer'>
           <img
-            style={{ maxWidth: '250px' }}
+            className="enemy-image"
             src={rowData.value.image_url}
             alt='Enemy'
           />
         </div>
-        <div className='itemDetails'>
-          <span style={{ marginTop: '4px' }}>❤️: {rowData.value.health} | ⚔️: {rowData.value.attack}</span>
-          <div style={{ border: '1px solid #ccc', marginTop: '12px', borderRadius: '16px'}}>
+        <div className='item-details'>
+          <span className="item-details-health">❤️: {rowData.value.health} | ⚔️: {rowData.value.attack}</span>
+          <div className="item-details-reward-container">
             <p>
               {rowData.value.reward_coin_amounts.map(
                 (rewardAmount: string, index: number) => `${rewardAmount} ${rowData?.value.reward_coin_types[index].split("::")[2]} `
@@ -83,7 +83,7 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
   
   return (
     <Col>
-      <div className='gridContainer'>
+      <div className='grid-container'>
         {enemiesList.map((rowData) => (
           <RowItem
             key={rowData.key}

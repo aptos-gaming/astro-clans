@@ -38,7 +38,7 @@ const BalanceContainer = ({ amount, coin_info }: BalanceContainerProps) => (
       <span className="coin-symbol">
         <img src={`/${coin_info.symbol}.png`} alt={coin_info.symbol} />
       </span>
-      <span style={{ fontWeight: 'bold'}}>
+      <span className="bold-text">
         {amount ? (amount / 10 ** Decimals).toFixed(2) : 0}
       </span>
     </span>

@@ -233,7 +233,7 @@ const Player = () => {
         message="Space fleet"
         description="Recruite mercenaries and send them to hunt space pirates. The more units you send, the higher the chance of success. If you succeed, you will be rewarded with gasolineium and hypersteel."
         showIcon
-        style={{ marginBottom: '16px' }}
+        className='margin-bottom-16'
       />
       <ContractsList onSelectedContract={setSelectedContract} unitsList={unitsList} />
       <BuyUnitsModal
@@ -247,7 +247,7 @@ const Player = () => {
         message="Hunt space pirates!"
         description="You have been attacked by space pirates! Send your mercenaries to defend your planets. If you succeed, you will be rewarded with gasolineium and hypersteel."
         showIcon
-        style={{ marginBottom: '16px' }}
+        className='margin-bottom-16'
       />
       <EnemiesList setSelectedEnemy={setSelectedEnemy} />
       <AttackEnemyModal
@@ -275,7 +275,7 @@ const Player = () => {
 
   return (
     <div className='player-page-wrapper'>
-      <div style={{ marginBottom: '16px' }}>
+      <div className='margin-bottom-16'>
         {/* allow mint token only if user hasnt any tokens or has less than 2 */}
         {(tokenBalances && tokenBalances.length < 1) || tokenBalances.length === 0 ? (
           <Tippy content="Mint a planet with random level property">
@@ -292,7 +292,7 @@ const Player = () => {
           <Tippy content="Airdrop 100 Gasolineium and 50 Hypersteel">
             <Button
               onClick={() => airdropResources(signAndSubmitTransaction, apolloClient)}
-              style={{ marginLeft: '8px' }}
+              className='airdrop-resources-button'
               type='primary'
             >
               Airdrop Resources

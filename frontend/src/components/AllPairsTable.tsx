@@ -61,7 +61,7 @@ const AllPairsTable = ({ data, onRemovePair, openReservesModal, onSelectedPairDa
                 Remove
               </Button>
               <Button
-                style={{ marginLeft: '0.5rem' }}
+               className="margin-left-8"
                 onClick={() => {
                   onSelectedPairData(record)
                   openReservesModal()

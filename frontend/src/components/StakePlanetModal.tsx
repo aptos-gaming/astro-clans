@@ -25,10 +25,10 @@ const StakePlanetModal = ({
       footer={null}
       onCancel={onHide}
     >
-      <div style={{ marginTop: '3rem' }}>
+      <div className="margin-top-48">
         <Button
           type="primary"
-          style={{ marginRight: '1rem'}}
+          className="margin-right-16"
           onClick={() => selectedToken && onStakeToken()}
           disabled={!selectedToken?.amount || !!unclaimedReward}
         >
@@ -36,7 +36,7 @@ const StakePlanetModal = ({
         </Button>
         <Button
           type="primary"
-          style={{ marginRight: '1rem'}}
+          className="margin-right-16"
           onClick={() => selectedToken && onUnstakeToken()}
           disabled={!unclaimedReward}
         >
@@ -44,7 +44,7 @@ const StakePlanetModal = ({
         </Button>
         <Button
           type="primary"
-          style={{ marginRight: '1rem'}}
+          className="margin-right-16"
           onClick={() => selectedToken && onClaimReward()}
           disabled={!unclaimedReward}
         >
@@ -59,7 +59,7 @@ const StakePlanetModal = ({
         </Button>
       </div>
       <p className="unclaimed-reward-text">
-        Unclaimed reward: <span style={{ color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}>{unclaimedReward} {rewardCoinType ? rewardCoinType.split('::')[2] : ''}</span>
+        Unclaimed reward: <span>{unclaimedReward} {rewardCoinType ? rewardCoinType.split('::')[2] : ''}</span>
         <br />
         <pre>Upgrade cost: Level * 100 gasolineium</pre>
       </p>

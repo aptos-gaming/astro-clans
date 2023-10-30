@@ -6,7 +6,7 @@ const Home = () => {
   const navigate = useNavigate()
 
   return (
-    <div className='homePage'>
+    <div className='home-page'>
       <div className='buttons'>
         <Button type="primary" onClick={() => navigate('/play')}>
           Play in Testnet

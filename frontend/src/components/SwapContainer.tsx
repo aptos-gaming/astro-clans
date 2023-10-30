@@ -90,7 +90,7 @@ const SwapContainer = ({ selectedPairData }: SwapContainerProps) => {
         <div className="swap-button">
           {account?.address ? (
             <Button
-              style={{ height: '2.5rem'}}
+              className="swap-button-container"
               onClick={() => swap(Number(coinFromAmount), selectedPairData, signAndSubmitTransaction, apolloClient)}
               block
               type="primary"

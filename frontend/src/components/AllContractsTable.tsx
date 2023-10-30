@@ -73,7 +73,7 @@ const AllContractsTable = ({ units, contracts, onRemoveContract, onSelectedContr
           key="action"
           render={(_:any, record: any) => (
             <Button
-              style={{ color: "black !important"}}
+              className='black-text'
               onClick={() => onRemoveContract(record.key)}
             >
               Remove

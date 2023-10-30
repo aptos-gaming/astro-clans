@@ -19,7 +19,7 @@ const BuyUnitsModal = ({ selectedContract, onCancel, maxUnits, onBuyUnits }: Buy
       onCancel={onCancel}
     >
       <Row>
-        <Col style={{width: '75%', marginRight: '1rem' }}>
+        <Col className="slider-container">
           <Slider
             min={1}
             max={maxUnits}
@@ -41,7 +41,11 @@ const BuyUnitsModal = ({ selectedContract, onCancel, maxUnits, onBuyUnits }: Buy
         <Button onClick={onCancel}>
           Cancel
         </Button>
-        <Button style={{ marginLeft: '8px'}} type="primary" onClick={() => onBuyUnits(numberOfUnits)}>
+        <Button
+          className="margin-left-8"
+          type="primary"
+          onClick={() => onBuyUnits(numberOfUnits)}
+        >
           Buy
         </Button>
       </div>

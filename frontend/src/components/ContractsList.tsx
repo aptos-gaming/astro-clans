@@ -47,7 +47,7 @@ const ContractsList = ({ onSelectedContract, unitsList }: ContractsListProps) =>
   const RowItem: React.FC<RowItemProps> = ({ rowData, onSelectedContract, unitData }) => {
     return (
       <div
-        className='enemyItem'
+        className='enemy-item'
         onClick={() => {
           onSelectedContract({
             contractId: rowData.key,
@@ -59,22 +59,22 @@ const ContractsList = ({ onSelectedContract, unitsList }: ContractsListProps) =>
           })
         }}
       >
-        <div style={{ textAlign: 'center'}}>
-          <p style={{ fontWeight: 'bold', fontSize: '18px' }}>{unitData?.value.name}</p>
+        <div className="center-text">
+          <p className="enemy-name">{unitData?.value.name}</p>
         </div>
-        <div className='enemyContainer'>
+        <div className="enemyContainer">
           <img
-            style={{ maxWidth: '250px' }}
+            className="enemy-image"
             src={unitData?.value.image_url}
             alt="unit"
           />
         </div>
-        <div style={{ marginBottom: '8px', textAlign: 'center' }}>
-          <span style={{ color: 'white' }}>❤️: {unitData?.value.health} | ⚔️: {unitData?.value.attack}</span>
+        <div className="contract-item-health">
+          <span className="white-text">❤️: {unitData?.value.health} | ⚔️: {unitData?.value.attack}</span>
         </div>
-        <div className='itemDetails' style={{ border: '1px solid #ccc', paddingBottom: '8px', borderRadius: '16px', margin: '0 16px'}}>
-          <span style={{ marginTop: '4px' }}>Cost:
-            <span style={{fontWeight: 'bold', fontSize: '16px'}}> {rowData.value.fixed_price} </span>
+        <div className="item-details contract-price-container">
+          <span className="margin-top-4">Cost:
+            <span className="contract-item-price"> {rowData.value.fixed_price} </span>
             {hexToText(rowData.value.resource_type_info.struct_name)}
           </span>
         </div>
@@ -84,7 +84,7 @@ const ContractsList = ({ onSelectedContract, unitsList }: ContractsListProps) =>
   
   return (
     <Col>
-      <div className='gridContainer'>
+      <div className='grid-container'>
         {contractsList.map((rowData) => {
           const unitData = unitsList.find((unit: Unit) => unit.key === rowData.value.unit_id)
 

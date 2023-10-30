@@ -74,7 +74,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
   return (
     <Form form={form} className="create-unit-form" {...layout}>
       <h3>Create new Enemy:</h3>
-      <Form.Item style={{ marginTop: '1rem !important' }} label="Name">
+      <Form.Item className="margin-top-16" label="Name">
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -104,7 +104,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
           placeholder="Enemy Image"
         />
         {imageUrl ? (
-          <img style={{ width: '250px', height: '250px'}} src={imageUrl} alt="enemy view" />
+          <img width="250" height="250" src={imageUrl} alt="enemy view" />
         ) : null}
       </Form.Item>
       <Form.Item label="Select Resource for Reward:">
@@ -146,7 +146,7 @@ const CreateEnemyLevelForm = ({ getEnemysList }: CreateEnemyLevelFormProps) => {
           />
         </Form.Item>
       )}
-      <Form.Item style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center'}}>
+      <Form.Item className="create-contract-button">
         <Button onClick={onCreateEnemy} type="primary">Create Enemy</Button>
       </Form.Item>
     </Form>

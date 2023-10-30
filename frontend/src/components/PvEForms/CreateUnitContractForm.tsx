@@ -109,7 +109,7 @@ const CreateUnitContractForm = ({ unitsList, getContractsList }: CreateUnitContr
           ))}
         </Select>
       </Form.Item>
-      <Form.Item style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center'}}>
+      <Form.Item className="create-contract-button">
         <Button onClick={onCreateContract} type="primary">Create Contract</Button>
       </Form.Item>
     </Form>

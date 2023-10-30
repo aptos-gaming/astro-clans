@@ -17,14 +17,11 @@ interface CreateUnitFormProps {
 }
 
 const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
-  const { signAndSubmitTransaction } = useWallet()
-  const [form] = Form.useForm()
-  
+  const { signAndSubmitTransaction } = useWallet()  
   const [name, setName] = useState<string>('Galactic Protector')
   const [symbol, setSymbol] = useState<string>('GPR')
   const [description, setDescription] = useState<string>('Galactic Protector Description')
   const [imageUrl, setImageUrl] = useState<string>('https://github.com/aptos-gaming/on-chain-pve-battles/blob/main/frontend/public/battleship.png?raw=true')
-
   const [attack, setAttack] = useState(10)
   const [health, setHealth] = useState(10)
 
@@ -77,7 +74,7 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
   }
 
   return (
-    <Form form={form} className="create-unit-form" {...layout}>
+    <Form className="create-unit-form" {...layout}>
       <Form.Item label="Name">
         <Input
           value={name}
@@ -105,7 +102,7 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
           onChange={(e) => setImageUrl(e.target.value)}
           placeholder="Unit image url"
         />
-        {imageUrl && <img style={{ marginTop: "0.5rem"}} width="200px" height="200px" src={imageUrl} alt="unit" />}
+        {imageUrl && <img className="margin-top-8" width="200px" height="200px" src={imageUrl} alt="unit" />}
       </Form.Item>
       <Form.Item label="Attack">
         <Input
@@ -124,9 +121,9 @@ const CreateUnitForm = ({ unitsList, getUnitsList }: CreateUnitFormProps) => {
         />
       </Form.Item>
       <Form.Item>
-        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', flexDirection: 'row'}}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <Button style={{ marginRight: '2rem' }} onClick={onCreateUnitType} type="primary">Init Unit Type</Button>
+        <div className="create-unit-buttons-container">
+          <div className="init-unit-button">
+            <Button className="margin-top-16" onClick={onCreateUnitType} type="primary">Init Unit Type</Button>
             <span className="tip-text">*init type before create unit</span>
           </div>
           <Button onClick={onCreateUnit} type="primary">Create Unit</Button>

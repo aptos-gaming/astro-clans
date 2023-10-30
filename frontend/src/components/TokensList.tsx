@@ -64,17 +64,17 @@ export const TokensList = () => {
   const RowItem: React.FC<RowItemProps> = ({ rowData, setSelectedToken }) => {
     return (
       <div
-        className='gridItem'
+        className='grid-item'
         onClick={() => setSelectedToken({ ...rowData })}
       >
-        <div className='itemImage'>
+        <div className='item-image'>
           <img
-            style={{ maxWidth: '250px' }}
+            className="enemy-image"
             src={rowData.current_token_data.token_uri}
             alt='Nft'
           />
         </div>
-        <div className='itemDetails'>
+        <div className='item-details'>
           <span className='planet-level'>⭐ {rowData.current_token_data.token_properties.level}</span>
           <span>Name: {rowData.current_token_data.token_name}</span>
           <span>Resources: Minerals</span>
@@ -87,7 +87,7 @@ export const TokensList = () => {
   return (
     <Col>
       {!loading && (
-        <div className='gridContainer'>
+        <div className='grid-container'>
           {tokens.map((rowData) => (
             <RowItem
               key={rowData.storage_id}

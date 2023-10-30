@@ -76,7 +76,7 @@ interface SwapEventsTableProps {
 }
 
 export const SwapEventsTable = ({ data }: SwapEventsTableProps) => (
-  <div style={{ marginBottom: '3rem', marginTop: '3rem'}}>
+  <div className="swap-events-table">
     <h3>All Swap Events</h3>
     <Table dataSource={data || []} columns={columns} />
   </div>

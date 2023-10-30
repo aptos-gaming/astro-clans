@@ -69,7 +69,7 @@ const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel }: AttackEnemyMod
             <div key={unit.key} className="unit-selection-slider">
               <span>{unit.value.name}</span>
               <Row>
-                <Col style={{width: '75%', marginRight: '1rem' }}>
+                <Col className="slider-container">
                   <Slider
                     min={0}
                     max={unitBalance}
@@ -102,7 +102,7 @@ const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel }: AttackEnemyMod
           <Button
             type="primary"
             disabled={unitsForAttack.length === 0}
-            style={{ marginLeft: '8px'}}
+            className='airdrop-resources-button'
             onClick={() => attackEnemy(selectedEnemy, unitsForAttack, signAndSubmitTransaction, apolloClient)}
           >
             Attack

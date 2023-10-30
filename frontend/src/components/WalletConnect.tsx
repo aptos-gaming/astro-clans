@@ -9,7 +9,7 @@ const WalletConnect = () => (
     <Col>
       <CoinBalance />
     </Col>
-    <Col style={{ textAlign: "right" }}>
+    <Col className="center-text">
       <WalletSelector />
     </Col>
   </Row>

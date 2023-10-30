@@ -253,7 +253,7 @@ export const CreatePairForm = ({ getAllTradingPairs }: any) => {
             </span>
           </div>
         )}
-      <Form.Item style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center'}}>
+      <Form.Item className="create-trading-pair-button">
         <Button onClick={onCreatePair} type="primary">Create Trading Pair</Button>
       </Form.Item>
     </Form>

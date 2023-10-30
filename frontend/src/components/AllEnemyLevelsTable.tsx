@@ -11,12 +11,11 @@ interface AllEnemyLevelsTableProps {
   onRemoveEnemyLevel: (levelId: string) => Promise<void>,
 }
 
-
 const AllEnemyLevelsTable = ({ levels, onSelectedLevel, onRemoveEnemyLevel }: AllEnemyLevelsTableProps) => {
   const { account } = useWallet()
 
   return (
-    <div style={{ marginBottom: '2rem' }}>
+    <div className="margin-bottom-32">
       <h3>All Enemies by Creator {account?.address}</h3>
       <Table
         dataSource={levels || []}
@@ -68,7 +67,7 @@ const AllEnemyLevelsTable = ({ levels, onSelectedLevel, onRemoveEnemyLevel }: Al
           key="action"
           render={(_:any, record: any) => (
             <Button
-              style={{ color: "black !important", zIndex: 999 }}
+              className="remove-enemy-level"
               onClick={(e) => {
                 e.preventDefault()
                 onRemoveEnemyLevel(record.key)
