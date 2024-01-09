@@ -147,12 +147,12 @@ const StakingLayout = () => {
     <>  
       <Col>
         <Button
-            onClick={() => airdropResources(signAndSubmitTransaction, apolloClient, 'admin')}
-            style={{ marginLeft: '8px' }}
-            type='primary'
-          >
-            Airdrop Resources
-          </Button>
+          className='airdrop-resources-button'
+          onClick={() => airdropResources(signAndSubmitTransaction, apolloClient, 'admin')}
+          type='primary'
+        >
+          Airdrop Resources
+        </Button>
         <h3 className='admin-section'>Token Staking</h3>
         <CreateCollectioForm
           createCollectionWithRewards={createCollectionWithRewards}

@@ -63,7 +63,7 @@ async function attackEnemy (
   unitsForAttack: any,
   signAndSubmitTransaction: (payload: any) => Promise<{ hash: string}>,
   apolloClient: ApolloClient<{}>,
-) {
+): Promise<string | undefined> {
   const unitType1 = String(Object.values(unitsForAttack)[0])?.split("-")[1]
   const unitId1 = Object.keys(unitsForAttack)[0]
   const numberOfUnits1ForAttack = unitsForAttack[unitId1].split("-")[0]
@@ -114,14 +114,23 @@ async function attackEnemy (
     // for 2 units - enemy_level_id: u64, number_of_units_1: u64, number_of_units_2: u64, unit_id_1: u64, unit_id_2: u64,
     arguments: payloadArgs,
   }
+  
+  let battleResult = "Loose"
 
   try {
-    const tx = await signAndSubmitTransaction(payload)
+    const tx: any = await signAndSubmitTransaction(payload)
+    tx.events.forEach((event: any) => {
+      if (event.data.result) {
+        battleResult = event.data.result
+      }
+    })
     await client.waitForTransactionWithResult(tx.hash)
     await apolloClient.refetchQueries({ include: [CoinBalancesQuery]})
+    return battleResult
   } catch (e) {
     console.log("ERROR during attack enemy")
     console.log(e)
+    return battleResult
   }
 }
 

@@ -1,25 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col, Button, Modal, Slider, InputNumber } from 'antd'
-import { useWallet } from '@aptos-labs/wallet-adapter-react';
-import { useApolloClient } from '@apollo/client'
  
 import useCoinBalances from '../context/useCoinBalances'
 import { Unit } from '../types'
-import { attackEnemy } from '../onChainUtils'
 
 interface AttackEnemyModalProps {
   selectedEnemy: any;
   unitsList: Array<Unit>
   onCancel: () => void;
+  onAttack: (unitsForAttack: any) => Promise<void>;
 }
 
 const Decimals = 8
 
-const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel }: AttackEnemyModalProps) => {
+const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel, onAttack }: AttackEnemyModalProps) => {
   const [unitsForAttack, setUnitsForAttack] = useState<any>({})
   const { coinBalances } = useCoinBalances()
-  const { signAndSubmitTransaction } = useWallet()
-  const apolloClient = useApolloClient()
 
   useEffect(() => {
     if (!selectedEnemy) {
@@ -103,13 +99,14 @@ const AttackEnemyModal = ({ selectedEnemy, unitsList, onCancel }: AttackEnemyMod
             type="primary"
             disabled={unitsForAttack.length === 0}
             className='airdrop-resources-button'
-            onClick={() => attackEnemy(selectedEnemy, unitsForAttack, signAndSubmitTransaction, apolloClient)}
+            onClick={() => onAttack(unitsForAttack)}
           >
             Attack
           </Button>
         </div>
       </>
     </Modal>
+
   )
 }
 

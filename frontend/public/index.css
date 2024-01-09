@@ -429,6 +429,10 @@ input::-webkit-inner-spin-button {
   border-radius: 16px;
 }
 
+.reward-text {
+  font-size: 0.9rem;
+}
+
 .remove-enemy-level {
   color: black !important;
   z-index: 999;

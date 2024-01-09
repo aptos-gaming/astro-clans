@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Confetti from 'react-confetti'
+import useWindowSize from 'react-use/lib/useWindowSize'
 
 export interface IConfettiProviderContext {
   shouldRun: boolean;
@@ -13,12 +14,13 @@ const defaultValues = {
 
 export const ConfettiProviderContext = React.createContext<IConfettiProviderContext>(defaultValues)
 
-export function CollectionOwnerProvider({ children }: any) {
+export function ConfettiProvider({ children }: any) {
   const [shouldRun, setShouldRun] = useState<boolean>(false)
-
+  const { width, height } = useWindowSize()
+  
   return (
     <ConfettiProviderContext.Provider value={{ shouldRun, setShouldRun }}>
-      <Confetti numberOfPieces={shouldRun ? 500 : 0} width={window.innerWidth} height={window.innerHeight} />
+      <Confetti numberOfPieces={shouldRun ? 350 : 0} width={width} height={height} />
       {children}
     </ConfettiProviderContext.Provider>
   )

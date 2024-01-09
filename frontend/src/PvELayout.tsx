@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Button } from 'antd'
+import { Button, Modal } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import Decimal from 'decimal.js'
 import { useApolloClient } from '@apollo/client'
+import { attackEnemy } from './onChainUtils'
 
 import {
   CreateEnemyForm,
@@ -16,6 +17,7 @@ import {
 } from './components'
 import { Enemy, Unit, Contract } from './types'
 import useCoinBalances from './context/useCoinBalances'
+import useConfetti from './context/useConffetti'
 import { CoinBalancesQuery } from './components/CoinBalance'
 import { client, provider } from './aptosClient'
 import { buyUnits } from './onChainUtils'
@@ -27,6 +29,7 @@ const PvELayout = () => {
   const { coinBalances } = useCoinBalances()
   const { account, signAndSubmitTransaction } = useWallet();
   const apolloClient = useApolloClient()
+  const { setShouldRun } = useConfetti()
 
   const [maxUnits, setMaxUnits] = useState(0)
   const [unitsList, setUnitsList] = useState<Array<Unit>>([])
@@ -37,6 +40,8 @@ const PvELayout = () => {
     levelId: string, attack: string, health: string, name: string, rewardCoinTypes: Array<string>,
   } | null>(null)
   const [numberOfUnits, setNumberOfUnits] = useState<number>(1)
+  const [modalWinVisible, setModalWinVisible] = useState(false)
+  const [modalLooseVisible, setModalLooseVisible] = useState(false)
 
   const getUnitsList = async () => {
     const payload = {
@@ -161,6 +166,22 @@ const PvELayout = () => {
     }
   }, [selectedContract])
 
+  const onAttackEnemy = async (unitsForAttack: any) => {
+    const battleResult = await attackEnemy(selectedEnemy, unitsForAttack, signAndSubmitTransaction, apolloClient)
+    if (!battleResult) return
+    // close on attack enenmy modal
+    setSelectedEnemy(null)
+
+    if (battleResult === "Win") {
+      // run confetti for 2.5s
+      setModalWinVisible(true)
+      setShouldRun(true)
+      setTimeout(() => setShouldRun(false), 2500)
+    } else {
+      setModalLooseVisible(true)
+    }
+  }
+
   return (
     <div>
       {coinBalances.length === 0 && (
@@ -194,7 +215,31 @@ const PvELayout = () => {
         onCancel={() => setSelectedEnemy(null)}
         unitsList={unitsList}
         selectedEnemy={selectedEnemy}
+        onAttack={onAttackEnemy}
       />
+      <Modal
+        title={"Congradulation! Victory!"}
+        open={modalWinVisible}
+        footer={null}
+        onCancel={() => setModalWinVisible(false)}
+      >
+        <div>
+          <span>You just won in battle agains comsic shit, take a look at battle report and your reward:</span>
+          <p className="black-text">Your reward is: 1000 GASOLIMUM</p>
+        </div>
+      </Modal>
+
+      <Modal
+        title={"Defeat :("}
+        open={modalLooseVisible}
+        footer={null}
+        onCancel={() => setModalLooseVisible(false)}
+      >
+        <div>
+          <span>You just lost in battle against strong enemy, prepare better next time!</span>
+        </div>
+      </Modal>
+
       {/* Modal to buy Units */}
       <BuyUnitsModal
         maxUnits={maxUnits}

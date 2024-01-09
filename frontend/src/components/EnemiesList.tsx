@@ -54,6 +54,7 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
             attack: rowData.value.attack,
             health: rowData.value.health,
             rewardCoinTypes: rowData.value.reward_coin_types,
+            rewardAmount: rowData.value.reward_coin_amounts,
           })
         }}
       >
@@ -71,6 +72,7 @@ const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
           <span className="item-details-health">❤️: {rowData.value.health} | ⚔️: {rowData.value.attack}</span>
           <div className="item-details-reward-container">
             <p>
+              <span className="reward-text">Reward: </span>
               {rowData.value.reward_coin_amounts.map(
                 (rewardAmount: string, index: number) => `${rewardAmount} ${rowData?.value.reward_coin_types[index].split("::")[2]} `
               )}

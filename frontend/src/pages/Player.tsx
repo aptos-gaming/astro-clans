@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Tabs, TabsProps } from 'antd'
+import { Alert, Button, Tabs, TabsProps, Modal } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
 import Tippy from '@tippyjs/react'
@@ -8,6 +8,7 @@ import Decimal from 'decimal.js'
 import useTokenBalances from '../context/useTokenBalances'
 import useCoinBalances from '../context/useCoinBalances'
 import useSelectedToken from '../context/useSelectedToken'
+import useConfetti from '../context/useConffetti'
 import {
   EnemiesList,
   AttackEnemyModal,
@@ -20,7 +21,7 @@ import {
 import { SwapPair, Unit } from '../types'
 import { provider } from '../aptosClient'
 import {
-  airdropResources, buyUnits, levelUpgrade, mintPlanet, stakeToken, unstakeToken, claimReward
+  airdropResources, buyUnits, levelUpgrade, mintPlanet, stakeToken, unstakeToken, claimReward, attackEnemy
 } from '../onChainUtils'
 import CONFIG from '../config.json'
 
@@ -32,11 +33,16 @@ const Player = () => {
   const { selectedToken, setSelectedToken } = useSelectedToken()
   const [ownerAddress, setOwnerAddress] = useState('')
   const { account, signAndSubmitTransaction } = useWallet()
+  const { setShouldRun } = useConfetti()
+  const [modalWinVisible, setModalWinVisible] = useState(false)
+  const [modalLooseVisible, setModalLooseVisible] = useState(false)
+
   const apolloClient = useApolloClient()
   const [unitsList, setUnitsList] = useState<Array<Unit>>([])
   const [selectedEnemy, setSelectedEnemy] = useState<{
-    levelId: string, attack: string, health: string, name: string, rewardCoinTypes: Array<string>,
+    levelId: string, attack: string, health: string, name: string, rewardCoinTypes: Array<string>, rewardAmount: String,
   } | null>(null)
+  const [enemyData, setEnemyData] = useState<any>({})
   const [selectedContract, setSelectedContract] = useState<any>()
   const [maxUnits, setMaxUnits] = useState(0)
   const [unclaimedReward, setUnclaimedReward] = useState(0)
@@ -127,10 +133,37 @@ const Player = () => {
     }
   }
 
+  const onAttackEnemy = async (unitsForAttack: any) => {
+    const battleResult = await attackEnemy(selectedEnemy, unitsForAttack, signAndSubmitTransaction, apolloClient)
+    if (!battleResult) return
+    // close on attack enenmy modal
+    setSelectedEnemy(null)
+
+    if (battleResult === "Win") {
+      setShouldRun(true)
+      setModalWinVisible(true)
+    } else {
+      setModalLooseVisible(true)
+    }
+  }
+
   const resetForms = () => {
     setSelectedToken(null)
     setUnclaimedReward(0)
   }
+
+  useEffect(() => {
+    if (!modalWinVisible) {
+      setShouldRun(false)
+    }
+  }, [modalWinVisible])
+
+  useEffect(() => {
+    if (selectedEnemy) {
+      setModalWinVisible(false)
+      setModalLooseVisible(false)
+    }
+  }, [selectedEnemy])
 
   useEffect(() => {
     if (account) {
@@ -163,6 +196,16 @@ const Player = () => {
       setMaxUnits(Math.floor(Number(validMaxAllowedUnits.toString())))
     }
   }, [selectedContract])
+
+  useEffect(() => {
+    if (selectedEnemy) {
+      setEnemyData({
+        name: selectedEnemy.name,
+        rewardType: selectedEnemy?.rewardCoinTypes,
+        rewardAmount: selectedEnemy?.rewardAmount,
+      })
+    }
+  }, [selectedEnemy])
 
   const StakingUI = () => (
     <>
@@ -254,7 +297,34 @@ const Player = () => {
         onCancel={() => setSelectedEnemy(null)}
         unitsList={unitsList}
         selectedEnemy={selectedEnemy}
+        onAttack={onAttackEnemy}
       />
+      <Modal
+        title={"Congratulations! Victory!"}
+        open={modalWinVisible}
+        footer={null}
+        onCancel={() => setModalWinVisible(false)}
+      >
+        <div>
+          <span>You just won in battle againts
+            <span className="bold-text"> {enemyData?.name}</span>, take a look at your reward:</span>
+          <p className="black-text">
+            Your reward is: 
+            <span className="bold-text"> {enemyData.rewardAmount} {enemyData.rewardType && String(enemyData?.rewardType)?.split('::')[2]}</span>
+          </p>
+        </div>
+      </Modal>
+
+      <Modal
+        title={"Defeat :("}
+        open={modalLooseVisible}
+        footer={null}
+        onCancel={() => setModalLooseVisible(false)}
+      >
+        <div>
+          <span>You just lost in battle against strong enemy, prepare better next time!</span>
+        </div>
+      </Modal>
     </>
   );
 

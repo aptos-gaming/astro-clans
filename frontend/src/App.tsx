@@ -17,8 +17,8 @@ import { CollectionOwnerProvider} from './context/CollectionOwnerProvider'
 import { TokenBalancesProvider } from './context/TokenBalancesProvider'
 import { CoinBalancesProvider } from './context/CoinBalancesProvider'
 import { SelectedTokenProvider } from './context/SelectedTokenProvider'
+import { ConfettiProvider } from './context/ConfettiProvider'
 import WalletConnect from './components/WalletConnect'
-import CoinBalance from './components/CoinBalance'
 import CONFIG from './config.json'
 import { Home, Admin, Player } from './pages'
 
@@ -44,7 +44,6 @@ const router = createBrowserRouter([
     element: (
       <>
         <WalletConnect />
-        {/* <CoinBalance /> */}
         <Admin />
       </>
     ),
@@ -52,11 +51,12 @@ const router = createBrowserRouter([
   {
     path: "/play",
     element: (
-      <div className='player-page-wrapper'>
-        <WalletConnect />
-        {/* <CoinBalance /> */}
-        <Player />
-      </div>
+      <>
+        <div className='player-page-wrapper'>
+          <WalletConnect />
+          <Player />
+        </div>
+      </>
     ),
   }
 ]);
@@ -72,8 +72,10 @@ const App = () => {
           <TokenBalancesProvider>
             <CoinBalancesProvider>
               <SelectedTokenProvider>
-                <RouterProvider router={router} />
-                <ToastContainer />
+                <ConfettiProvider>
+                  <RouterProvider router={router} />
+                  <ToastContainer />
+                </ConfettiProvider>
               </SelectedTokenProvider>
             </CoinBalancesProvider>
           </TokenBalancesProvider>
