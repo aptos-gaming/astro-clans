@@ -5,4 +5,8 @@
 2. cd `/move/swap`, run `aptos move create-resource-account-and-publish-package --seed 12345 --address-name owner_addr --profile default --named-addresses source_addr=YOUR_ADDRESS`
 3. cd `/move/pve`, run `aptos move create-resource-account-and-publish-package --seed 56789 --address-name owner_addr --profile default --named-addresses source_addr=YOUR_ADDRESS`
 
+### To run frontend:
+1. cd `/frontend`
+2. `yarn install`
+3. `npm run start`
 
