@@ -115,7 +115,7 @@ async function attackEnemy (
     arguments: payloadArgs,
   }
   
-  let battleResult = "Loose"
+  let battleResult = ""
 
   try {
     const tx: any = await signAndSubmitTransaction(payload)

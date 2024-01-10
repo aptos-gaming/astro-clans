@@ -14,35 +14,11 @@ interface RowItemProps {
 }
 
 interface EnemiesListProps {
+  enemiesList: Array<any>,
   setSelectedEnemy: (newEnemy: any) => void
 }
 
-const EnemiesList = ({ setSelectedEnemy }: EnemiesListProps) => {
-  const [enemiesList, setEnemiesList] = useState<Enemy[]>([])
-  const { account } = useWallet()
-
-  const getEnemysList = async () => {
-    const payload = {
-      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::get_all_enemy_levels`,
-      type_arguments: [],
-      arguments: [CONFIG.pveOwner]
-    }
-
-    try {
-      const allEnemyLevelsResponse: any = await provider.view(payload)
-      setEnemiesList(allEnemyLevelsResponse[0].data)
-    } catch(e) {
-      console.log("ERROR during getting enemy levels list")
-      console.log(e)
-    }
-  }
-
-  useEffect(() => {
-    if (account) {
-      getEnemysList()
-    }
-  }, [account])
-  
+const EnemiesList = ({ setSelectedEnemy, enemiesList }: EnemiesListProps) => {
   const RowItem: React.FC<RowItemProps> = ({ rowData, setSelectedEnemy }) => {
     return (
       <div

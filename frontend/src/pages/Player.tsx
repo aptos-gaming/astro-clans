@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Tabs, TabsProps, Modal } from 'antd'
+import { Alert, Button, Tabs, TabsProps, Modal, Switch } from 'antd'
 import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useApolloClient } from '@apollo/client'
 import Tippy from '@tippyjs/react'
@@ -17,9 +17,10 @@ import {
   ContractsList,
   StakePlanetModal,
   SwapContainer,
+  EventsTable,
 } from '../components'
 import { SwapPair, Unit } from '../types'
-import { provider } from '../aptosClient'
+import { client, provider } from '../aptosClient'
 import {
   airdropResources, buyUnits, levelUpgrade, mintPlanet, stakeToken, unstakeToken, claimReward, attackEnemy
 } from '../onChainUtils'
@@ -48,6 +49,9 @@ const Player = () => {
   const [unclaimedReward, setUnclaimedReward] = useState(0)
   const [rewardCoinType, setRewardCoinType] = useState('')
   const [selectedPairData, setSelectedPairData] = useState<SwapPair | null>(null)
+  const [eventsData, setEventsData] = useState<Array<any>>([])
+  const [enemiesList, setEnemiesList] = useState<Array<any>>([])
+  const [showBattleLogs, setShowBattleLogs] = useState(false)
 
   const getUnitsList = async () => {
     const payload = {
@@ -133,8 +137,26 @@ const Player = () => {
     }
   }
 
+  const getEnemysList = async () => {
+    const payload = {
+      function: `${CONFIG.pveModule}::${CONFIG.pvePackageName}::get_all_enemy_levels`,
+      type_arguments: [],
+      arguments: [CONFIG.pveOwner]
+    }
+
+    try {
+      const allEnemyLevelsResponse: any = await provider.view(payload)
+      setEnemiesList(allEnemyLevelsResponse[0].data)
+    } catch(e) {
+      console.log("ERROR during getting enemy levels list")
+      console.log(e)
+    }
+  }
+
   const onAttackEnemy = async (unitsForAttack: any) => {
     const battleResult = await attackEnemy(selectedEnemy, unitsForAttack, signAndSubmitTransaction, apolloClient)
+    await getBattleLogs()
+    
     if (!battleResult) return
     // close on attack enenmy modal
     setSelectedEnemy(null)
@@ -142,8 +164,23 @@ const Player = () => {
     if (battleResult === "Win") {
       setShouldRun(true)
       setModalWinVisible(true)
-    } else {
+    } else if (battleResult === "Loose") {
       setModalLooseVisible(true)
+    }
+  }
+
+  const getBattleLogs = async () => {
+    const eventStore = `${CONFIG.pveModule}::${CONFIG.pvePackageName}::Events`
+
+    try {
+      const attackedEvents = await client.getEventsByEventHandle(account?.address || '', eventStore, "enemy_attacked_event")
+  
+      setEventsData(attackedEvents)
+    } catch (e: any) {
+      const errorMessage = JSON.parse(e.message)
+      if (errorMessage.error_code === "resource_not_found") {
+        console.log("No attackes for now")
+      }
     }
   }
 
@@ -170,6 +207,8 @@ const Player = () => {
       getCollectionOwnerAddress()
       getUnitsList()
       getTradingPairs()
+      getEnemysList()
+      getBattleLogs()
     }
   }, [account])
 
@@ -292,7 +331,10 @@ const Player = () => {
         showIcon
         className='margin-bottom-16'
       />
-      <EnemiesList setSelectedEnemy={setSelectedEnemy} />
+      <EnemiesList
+        enemiesList={enemiesList}
+        setSelectedEnemy={setSelectedEnemy}
+      />
       <AttackEnemyModal
         onCancel={() => setSelectedEnemy(null)}
         unitsList={unitsList}
@@ -306,7 +348,7 @@ const Player = () => {
         onCancel={() => setModalWinVisible(false)}
       >
         <div>
-          <span>You just won in battle againts
+          <span>You just won in battle against
             <span className="bold-text"> {enemyData?.name}</span>, take a look at your reward:</span>
           <p className="black-text">
             Your reward is: 
@@ -325,6 +367,14 @@ const Player = () => {
           <span>You just lost in battle against strong enemy, prepare better next time!</span>
         </div>
       </Modal>
+      {/* show battle logs */}
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+        <span className="white-text">Show Battle Logs: </span>
+        <Switch style={{ marginLeft: '1rem' }} checked={showBattleLogs} defaultChecked={false} onChange={() => setShowBattleLogs(!showBattleLogs)} />
+      </div>
+      {showBattleLogs && (
+        <EventsTable data={eventsData} enemiesList={enemiesList} />
+      )}
     </>
   );
 

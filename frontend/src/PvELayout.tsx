@@ -30,6 +30,7 @@ const PvELayout = () => {
   const { account, signAndSubmitTransaction } = useWallet();
   const apolloClient = useApolloClient()
   const { setShouldRun } = useConfetti()
+  const [enemyData, setEnemyData] = useState<any>({})
 
   const [maxUnits, setMaxUnits] = useState(0)
   const [unitsList, setUnitsList] = useState<Array<Unit>>([])
@@ -37,7 +38,7 @@ const PvELayout = () => {
   const [enemyLevelsList, setEnemyLevelsList] = useState<Array<Enemy>>([])
   const [selectedContract, setSelectedContract] = useState<any>()
   const [selectedEnemy, setSelectedEnemy] = useState<{
-    levelId: string, attack: string, health: string, name: string, rewardCoinTypes: Array<string>,
+    levelId: string, attack: string, health: string, name: string, rewardCoinTypes: Array<string>, rewardAmount: number,
   } | null>(null)
   const [numberOfUnits, setNumberOfUnits] = useState<number>(1)
   const [modalWinVisible, setModalWinVisible] = useState(false)
@@ -53,7 +54,6 @@ const PvELayout = () => {
     try {
       const allUnitsResponse: any = await provider.view(payload)
       setUnitsList(allUnitsResponse[0].data)
-      console.log("All Units: ", allUnitsResponse)
     } catch(e) {
       console.log("ERROR during getting units list")
       console.log(e)
@@ -155,6 +155,16 @@ const PvELayout = () => {
   }, [account])
 
   useEffect(() => {
+    if (selectedEnemy) {
+      setEnemyData({
+        name: selectedEnemy.name,
+        rewardType: selectedEnemy?.rewardCoinTypes,
+        rewardAmount: selectedEnemy?.rewardAmount,
+      })
+    }
+  }, [selectedEnemy])
+
+  useEffect(() => {
     if (selectedContract) {
       const contractResourceBalance = coinBalances?.find((coinBalance) => coinBalance.coin_info.name.includes(selectedContract?.resourceName))
       if (!contractResourceBalance) return
@@ -177,7 +187,7 @@ const PvELayout = () => {
       setModalWinVisible(true)
       setShouldRun(true)
       setTimeout(() => setShouldRun(false), 2500)
-    } else {
+    } else if (battleResult === "Loose") {
       setModalLooseVisible(true)
     }
   }
@@ -218,14 +228,18 @@ const PvELayout = () => {
         onAttack={onAttackEnemy}
       />
       <Modal
-        title={"Congradulation! Victory!"}
+        title={"Congratulations! Victory!"}
         open={modalWinVisible}
         footer={null}
         onCancel={() => setModalWinVisible(false)}
       >
         <div>
-          <span>You just won in battle agains comsic shit, take a look at battle report and your reward:</span>
-          <p className="black-text">Your reward is: 1000 GASOLIMUM</p>
+          <span>You just won in battle against
+            <span className="bold-text"> {enemyData?.name}</span>, take a look at your reward:</span>
+          <p className="black-text">
+            Your reward is: 
+            <span className="bold-text"> {enemyData.rewardAmount} {enemyData.rewardType && String(enemyData?.rewardType)?.split('::')[2]}</span>
+          </p>
         </div>
       </Modal>
 

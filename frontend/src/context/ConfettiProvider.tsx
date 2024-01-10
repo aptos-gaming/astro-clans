@@ -20,7 +20,7 @@ export function ConfettiProvider({ children }: any) {
   
   return (
     <ConfettiProviderContext.Provider value={{ shouldRun, setShouldRun }}>
-      <Confetti numberOfPieces={shouldRun ? 350 : 0} width={width} height={height} />
+      <Confetti numberOfPieces={shouldRun ? 300 : 0} width={width} height={height} />
       {children}
     </ConfettiProviderContext.Provider>
   )
