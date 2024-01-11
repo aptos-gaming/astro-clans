@@ -10,7 +10,9 @@ const columns = [
   {
     title: 'Result',
     key: 'battle_result',
-    render: (value: any) => value?.result
+    render: (value: any) => { 
+      return value?.result === 'Win' ? 'Victory' : 'Defeat' 
+    }
   },
   {
     title: 'Total Units Attack',

@@ -228,14 +228,14 @@ const PvELayout = () => {
         onAttack={onAttackEnemy}
       />
       <Modal
-        title={"Congratulations! Victory!"}
+        title={"Victory!"}
         open={modalWinVisible}
         footer={null}
         onCancel={() => setModalWinVisible(false)}
       >
         <div>
-          <span>You just won in battle against
-            <span className="bold-text"> {enemyData?.name}</span>, take a look at your reward:</span>
+          <span>You just won a battle against the
+            <span className="bold-text"> {enemyData?.name}</span>. Take a look at your reward.</span>
           <p className="black-text">
             Your reward is: 
             <span className="bold-text"> {enemyData.rewardAmount} {enemyData.rewardType && String(enemyData?.rewardType)?.split('::')[2]}</span>
@@ -250,7 +250,7 @@ const PvELayout = () => {
         onCancel={() => setModalLooseVisible(false)}
       >
         <div>
-          <span>You just lost in battle against strong enemy, prepare better next time!</span>
+          <span>You just lost a battle against a strong enemy. Prepare better for next time!</span>
         </div>
       </Modal>
 
